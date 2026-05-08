@@ -1,1 +1,80 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --ink: #080b10;
+  --surface: #0d1117;
+  --card: #111820;
+  --card-hover: #161f2a;
+  --border: #1a2535;
+  --border-hover: #253548;
+
+  --cyan: #00d4ff;
+  --cyan-dim: rgba(0, 212, 255, 0.12);
+  --teal: #00c896;
+  --teal-dim: rgba(0, 200, 150, 0.12);
+  --amber: #f5a623;
+  --amber-dim: rgba(245, 166, 35, 0.12);
+  --coral: #ff6b6b;
+  --coral-dim: rgba(255, 107, 107, 0.12);
+  --purple: #a78bfa;
+  --purple-dim: rgba(167, 139, 250, 0.12);
+  --pink: #e879f9;
+
+  --text-primary: #d0e4f4;
+  --text-secondary: #6a8aaa;
+  --text-muted: #3a5570;
+
+  --font-head: 'Syne', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  background: var(--ink);
+  color: var(--text-primary);
+  font-family: var(--font-head);
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+
+/* Animations */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.75); }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.8; }
+}
+@keyframes slide-in-right {
+  from { transform: translateX(120%); opacity: 0; }
+  to   { transform: translateX(0);   opacity: 1; }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes flow-bar {
+  from { width: 0%; }
+}
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 8px var(--cyan); }
+  50%       { box-shadow: 0 0 20px var(--cyan), 0 0 40px rgba(0,212,255,0.2); }
+}
+
+.animate-pulse-dot  { animation: pulse-dot 2s ease-in-out infinite; }
+.animate-spin-slow  { animation: spin 1.2s linear infinite; }
+.animate-fade-up    { animation: fade-up 0.4s ease forwards; }
+.animate-slide-notif { animation: slide-in-right 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+.animate-glow       { animation: glow-pulse 2.5s ease-in-out infinite; }
