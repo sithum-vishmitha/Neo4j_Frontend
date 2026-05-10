@@ -1,14 +1,4 @@
-export type NodeType =
-  | "Location"
-  | "Fish"
-  | "Tool"
-  | "Concept"
-  | "Activity"
-  | "Threat"
-  | "Group"
-  | "Craft"
-  | "Attribute";
-
+export type NodeType = string
 export interface KGNode {
   id: string;
   type: NodeType;

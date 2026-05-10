@@ -498,7 +498,7 @@ export function GraphViewport() {
                   {/* Label */}
                   <text
                     x={cx}
-                    y={cy - 8}
+                    y={cy - 1}
                     textAnchor="middle"
                     fill="#94A3B8"
                     fontSize={9}
@@ -507,7 +507,7 @@ export function GraphViewport() {
                       letterSpacing: "0.04em",
                     }}
                   >
-                    {edge.rel}
+                    {edge.rel} 
                   </text>
                 </g>
               );
