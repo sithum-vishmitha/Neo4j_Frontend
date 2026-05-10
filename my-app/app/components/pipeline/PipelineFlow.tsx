@@ -29,7 +29,7 @@ const statusBg = {
 
 export function PipelineFlow({ steps }: PipelineFlowProps) {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col text-white">
       {steps.map((step, i) => (
         <div key={step.id} className="flex gap-3 relative" style={{ paddingBottom: i < steps.length - 1 ? 16 : 0 }}>
           {/* Vertical connector line */}

@@ -86,7 +86,7 @@ export function GraphViewport() {
   const { w: svgW, h: svgH } = dims.current;
 
   return (
-    <div className="flex flex-col h-full" style={{ background: "var(--ink)" }}>
+    <div className="flex flex-col h-full text-white" style={{ background: "var(--ink)" }}>
       {/* Viewport header */}
       <div
         className="flex items-center justify-between px-6 py-3 border-b flex-shrink-0"
