@@ -45,7 +45,6 @@ export function GraphViewport() {
     x: 0,
     y: 0,
   });
-  
 
   const [layoutMode, setLayoutMode] = useState(0);
 
@@ -62,9 +61,6 @@ export function GraphViewport() {
     w: 800,
     h: 500,
   });
-
-  const animationRef = useRef<number | null>(null);
-
 
   
 
@@ -474,10 +470,10 @@ export function GraphViewport() {
               const curve = 0.18;
 
               const cx =
-                ((ep1.x + ep2.x) / 2 - dy * curve);
+                (ep1.x + ep2.x) / 2 - dy * curve;
 
               const cy =
-                ((ep1.y + ep2.y) / 2 + dx * curve);
+                (ep1.y + ep2.y) / 2 + dx * curve;
 
               return (
                 <g key={edge.id}>
