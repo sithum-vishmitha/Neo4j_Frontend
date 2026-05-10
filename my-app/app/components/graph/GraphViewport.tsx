@@ -1,9 +1,28 @@
 "use client";
+
 import { useEffect, useRef, useState, useCallback } from "react";
+import {
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  LayoutGrid,
+  Sparkles,
+} from "lucide-react";
+
 import type { KGNode, KGEdge } from "@/app/types";
-import { INITIAL_NODES, INITIAL_EDGES, CSV_SAMPLES, NODE_COLORS } from "@/app/lib/graphData";
-import { layoutRadial, layoutGrid, getNodeRadius, edgeEndpoint } from "@/app/lib/graphLayout";
-import type { NodeType } from "@/app/types";
+
+import {
+  INITIAL_NODES,
+  INITIAL_EDGES,
+  NODE_COLORS,
+} from "@/app/lib/graphData";
+
+import {
+  layoutRadial,
+  layoutGrid,
+  getNodeRadius,
+  edgeEndpoint,
+} from "@/app/lib/graphLayout";
 
 interface Tooltip {
   node: KGNode;
@@ -14,176 +33,479 @@ interface Tooltip {
 export function GraphViewport() {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
   const [nodes, setNodes] = useState<KGNode[]>([]);
-  const [edges]  = useState<KGEdge[]>(INITIAL_EDGES);
+  const [edges] = useState<KGEdge[]>(INITIAL_EDGES);
+
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
-  const [zoom, setZoom]   = useState(1);
-  const [pan, setPan]     = useState({ x: 0, y: 0 });
+
+  const [zoom, setZoom] = useState(1);
+
+  const [pan, setPan] = useState({
+    x: 0,
+    y: 0,
+  });
+
   const [layoutMode, setLayoutMode] = useState(0);
+
   const isPanning = useRef(false);
-  const panStart  = useRef({ mx: 0, my: 0, px: 0, py: 0 });
-  const dims      = useRef({ w: 800, h: 500 });
+
+  const panStart = useRef({
+    mx: 0,
+    my: 0,
+    px: 0,
+    py: 0,
+  });
+
+  const dims = useRef({
+    w: 800,
+    h: 500,
+  });
+
+  
 
   const relayout = useCallback((mode: number) => {
     const { w, h } = dims.current;
+
     setNodes(
       mode === 0
-        ? layoutRadial(INITIAL_NODES.map(n => ({ ...n })), w, h)
-        : layoutGrid(INITIAL_NODES.map(n => ({ ...n })), w)
+        ? layoutRadial(
+            INITIAL_NODES.map((n) => ({ ...n })),
+            w,
+            h
+          )
+        : layoutGrid(
+            INITIAL_NODES.map((n) => ({ ...n })),
+            w
+          )
     );
   }, []);
 
   useEffect(() => {
     const el = containerRef.current;
+
     if (!el) return;
+
     const obs = new ResizeObserver(([entry]) => {
-      dims.current = { w: entry.contentRect.width, h: entry.contentRect.height };
+      dims.current = {
+        w: entry.contentRect.width,
+        h: entry.contentRect.height,
+      };
+
       relayout(layoutMode);
     });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [relayout, layoutMode]);
 
-  // Wheel zoom
+    obs.observe(el);
+
+    return () => obs.disconnect();
+  }, [layoutMode, relayout]);
+
   useEffect(() => {
     const svg = svgRef.current;
+
     if (!svg) return;
+
     const handler = (e: WheelEvent) => {
       e.preventDefault();
-      setZoom(z => Math.max(0.25, Math.min(4, z * (e.deltaY > 0 ? 0.9 : 1.1))));
+
+      setZoom((z) =>
+        Math.max(
+          0.25,
+          Math.min(4, z * (e.deltaY > 0 ? 0.9 : 1.1))
+        )
+      );
     };
-    svg.addEventListener("wheel", handler, { passive: false });
+
+    svg.addEventListener("wheel", handler, {
+      passive: false,
+    });
+
     return () => svg.removeEventListener("wheel", handler);
   }, []);
 
   const onMouseDown = (e: React.MouseEvent) => {
     isPanning.current = true;
-    panStart.current = { mx: e.clientX, my: e.clientY, px: pan.x, py: pan.y };
+
+    panStart.current = {
+      mx: e.clientX,
+      my: e.clientY,
+      px: pan.x,
+      py: pan.y,
+    };
   };
+
   const onMouseMove = (e: React.MouseEvent) => {
     if (!isPanning.current) return;
+
     setPan({
-      x: panStart.current.px + (e.clientX - panStart.current.mx),
-      y: panStart.current.py + (e.clientY - panStart.current.my),
+      x:
+        panStart.current.px +
+        (e.clientX - panStart.current.mx),
+
+      y:
+        panStart.current.py +
+        (e.clientY - panStart.current.my),
     });
   };
-  const onMouseUp = () => { isPanning.current = false; };
 
-  const handleNodeEnter = (e: React.MouseEvent, node: KGNode) => {
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    setTooltip({ node, x: e.clientX - rect.left + 14, y: e.clientY - rect.top + 14 });
+  const onMouseUp = () => {
+    isPanning.current = false;
   };
-  const handleNodeLeave = () => setTooltip(null);
+
+  const handleNodeEnter = (
+    e: React.MouseEvent,
+    node: KGNode
+  ) => {
+    const rect =
+      containerRef.current?.getBoundingClientRect();
+
+    if (!rect) return;
+
+    setTooltip({
+      node,
+      x: e.clientX - rect.left + 16,
+      y: e.clientY - rect.top + 16,
+    });
+  };
+
+  const handleNodeLeave = () => {
+    setTooltip(null);
+  };
 
   const toggleLayout = () => {
     const next = (layoutMode + 1) % 2;
+
     setLayoutMode(next);
+
     relayout(next);
   };
 
-  const nodeMap = Object.fromEntries(nodes.map(n => [n.id, n]));
+  const nodeMap = Object.fromEntries(
+    nodes.map((n) => [n.id, n])
+  );
+
   const { w: svgW, h: svgH } = dims.current;
 
   return (
-    <div className="flex flex-col h-full text-white" style={{ background: "var(--ink)" }}>
-      {/* Viewport header */}
+    <div className="flex h-full flex-col bg-[#060B14] text-white">
+
+      {/* HEADER */}
       <div
-        className="flex items-center justify-between px-6 py-3 border-b flex-shrink-0"
-        style={{ borderColor: "var(--border)", background: "rgba(13,17,23,0.85)", backdropFilter: "blur(10px)" }}
+        className="
+          flex items-center justify-between
+          border-b border-white/10
+          bg-black/30
+          px-6 py-4
+          backdrop-blur-xl
+        "
       >
-        <div className="flex items-center gap-3">
-          <span style={{ fontSize: 16, color: "var(--purple)" }}>◈</span>
-          <span style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>Neo4j + GraphXR Viewport</span>
-          <span
-            className="rounded px-2 py-0.5"
-            style={{
-              background: "var(--purple-dim)",
-              border: "1px solid rgba(167,139,250,0.3)",
-              color: "var(--purple)",
-              fontFamily: "var(--font-mono)",
-              fontSize: 10,
-            }}
+        {/* Left */}
+        <div className="flex items-center gap-4">
+
+          <div
+            className="
+              flex h-10 w-10 items-center justify-center
+              rounded-2xl
+              border border-cyan-400/20
+              bg-cyan-400/10
+            "
           >
-            LIVE PREVIEW
-          </span>
+            <Sparkles className="h-5 w-5 text-cyan-300" />
+          </div>
+
+          <div>
+            <div className="text-sm font-semibold tracking-[0.08em] text-white">
+              KNOWLEDGE GRAPH VIEWPORT
+            </div>
+
+            <div className="mt-1 text-xs text-slate-400">
+              Neo4j-style graph visualization engine
+            </div>
+          </div>
+
+          <div
+            className="
+              rounded-full border border-violet-400/20
+              bg-violet-400/10
+              px-3 py-1
+              font-mono text-[10px]
+              tracking-[0.16em]
+              text-violet-300
+            "
+          >
+            LIVE GRAPH
+          </div>
         </div>
+
+        {/* Controls */}
         <div className="flex items-center gap-2">
-          {[
-            { icon: "+", action: () => setZoom(z => Math.min(4, z * 1.2)),  tip: "Zoom in" },
-            { icon: "−", action: () => setZoom(z => Math.max(0.25, z / 1.2)), tip: "Zoom out" },
-            { icon: "⊡", action: () => { setZoom(1); setPan({ x: 0, y: 0 }); }, tip: "Reset" },
-            { icon: "⇄", action: toggleLayout, tip: "Toggle layout" },
-          ].map(({ icon, action, tip }) => (
-            <button
-              key={tip}
-              title={tip}
-              onClick={action}
-              className="flex items-center justify-center rounded transition-all"
-              style={{
-                width: 30, height: 30,
-                border: "1px solid var(--border)",
-                background: "var(--card)",
-                color: "var(--text-secondary)",
-                fontSize: 14,
-                cursor: "pointer",
-              }}
-            >
-              {icon}
-            </button>
-          ))}
+
+          {/* Zoom In */}
+          <button
+            onClick={() =>
+              setZoom((z) => Math.min(4, z * 1.2))
+            }
+            className="
+              flex h-10 w-10 items-center justify-center
+              rounded-xl border border-white/10
+              bg-white/[0.03]
+              transition-all duration-300
+              hover:border-cyan-400/20
+              hover:bg-cyan-400/10
+            "
+          >
+            <ZoomIn className="h-4 w-4 text-slate-300" />
+          </button>
+
+          {/* Zoom Out */}
+          <button
+            onClick={() =>
+              setZoom((z) => Math.max(0.25, z / 1.2))
+            }
+            className="
+              flex h-10 w-10 items-center justify-center
+              rounded-xl border border-white/10
+              bg-white/[0.03]
+              transition-all duration-300
+              hover:border-cyan-400/20
+              hover:bg-cyan-400/10
+            "
+          >
+            <ZoomOut className="h-4 w-4 text-slate-300" />
+          </button>
+
+          {/* Reset */}
+          <button
+            onClick={() => {
+              setZoom(1);
+
+              setPan({
+                x: 0,
+                y: 0,
+              });
+            }}
+            className="
+              flex h-10 w-10 items-center justify-center
+              rounded-xl border border-white/10
+              bg-white/[0.03]
+              transition-all duration-300
+              hover:border-cyan-400/20
+              hover:bg-cyan-400/10
+            "
+          >
+            <RotateCcw className="h-4 w-4 text-slate-300" />
+          </button>
+
+          {/* Layout */}
+          <button
+            onClick={toggleLayout}
+            className="
+              flex h-10 w-10 items-center justify-center
+              rounded-xl border border-white/10
+              bg-white/[0.03]
+              transition-all duration-300
+              hover:border-cyan-400/20
+              hover:bg-cyan-400/10
+            "
+          >
+            <LayoutGrid className="h-4 w-4 text-slate-300" />
+          </button>
         </div>
       </div>
 
-      {/* Canvas */}
+      {/* GRAPH AREA */}
       <div
         ref={containerRef}
-        className="relative flex-1 overflow-hidden"
+        className="
+          relative flex-1 overflow-hidden
+          bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.08),transparent_35%)]
+        "
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
         onMouseLeave={onMouseUp}
-        style={{ cursor: isPanning.current ? "grabbing" : "grab" }}
+        style={{
+          cursor: isPanning.current
+            ? "grabbing"
+            : "grab",
+        }}
       >
+
+        {/* GRID */}
+        <div
+          className="
+            absolute inset-0 opacity-[0.03]
+            bg-[linear-gradient(rgba(255,255,255,0.3)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.3)_1px,transparent_1px)]
+            bg-[size:40px_40px]
+          "
+        />
+
+        {/* LEGEND */}
+        <div
+          className="
+            absolute left-5 top-5 z-20
+            rounded-2xl border border-white/10
+            bg-black/40
+            px-4 py-4
+            backdrop-blur-xl
+            shadow-[0_0_40px_rgba(0,0,0,0.45)]
+          "
+        >
+          <div
+            className="
+              mb-3 text-xs font-semibold
+              tracking-[0.18em]
+              text-slate-400
+            "
+          >
+            NODE TYPES
+          </div>
+
+          <div className="space-y-2">
+            {Object.entries(NODE_COLORS).map(
+              ([type, color]) => (
+                <div
+                  key={type}
+                  className="flex items-center gap-3"
+                >
+                  <div
+                    className="h-3 w-3 rounded-full"
+                    style={{
+                      background: color,
+                      boxShadow: `0 0 12px ${color}`,
+                    }}
+                  />
+
+                  <span className="text-xs text-slate-200">
+                    {type}
+                  </span>
+                </div>
+              )
+            )}
+          </div>
+        </div>
+
+        {/* SVG */}
         <svg
           ref={svgRef}
           width="100%"
           height="100%"
-          style={{ display: "block" }}
+          style={{
+            display: "block",
+          }}
         >
           <defs>
-            <marker id="arrowhead" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-              <path d="M1 1L8 5L1 9" fill="none" stroke="#1a2535" strokeWidth="2" strokeLinecap="round"/>
+
+            {/* Glow */}
+            <filter
+              id="glow"
+              x="-50%"
+              y="-50%"
+              width="200%"
+              height="200%"
+            >
+              <feGaussianBlur
+                stdDeviation="3"
+                result="coloredBlur"
+              />
+
+              <feMerge>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+
+            {/* Arrow */}
+            <marker
+              id="arrowhead"
+              viewBox="0 0 10 10"
+              refX="8"
+              refY="5"
+              markerWidth="7"
+              markerHeight="7"
+              orient="auto"
+            >
+              <path
+                d="M 0 0 L 10 5 L 0 10 z"
+                fill="rgba(148,163,184,0.7)"
+              />
             </marker>
           </defs>
 
-          <g transform={`translate(${pan.x},${pan.y}) scale(${zoom})`}>
-            {/* Edges */}
+          <g
+            transform={`
+              translate(${pan.x},${pan.y})
+              scale(${zoom})
+            `}
+          >
+
+            {/* EDGES */}
             {edges.map((edge) => {
               const src = nodeMap[edge.source];
+
               const tgt = nodeMap[edge.target];
+
               if (!src || !tgt) return null;
+
               const rSrc = getNodeRadius(src.type);
+
               const rTgt = getNodeRadius(tgt.type);
-              const ep1 = edgeEndpoint(src, tgt, rSrc);
-              const ep2 = edgeEndpoint(tgt, src, rTgt);
-              const mx  = (ep1.x + ep2.x) / 2;
-              const my  = (ep1.y + ep2.y) / 2;
+
+              const ep1 = edgeEndpoint(
+                src,
+                tgt,
+                rSrc
+              );
+
+              const ep2 = edgeEndpoint(
+                tgt,
+                src,
+                rTgt
+              );
+
+              const dx = ep2.x - ep1.x;
+
+              const dy = ep2.y - ep1.y;
+
+              const curve = 0.18;
+
+              const cx =
+                (ep1.x + ep2.x) / 2 - dy * curve;
+
+              const cy =
+                (ep1.y + ep2.y) / 2 + dx * curve;
 
               return (
                 <g key={edge.id}>
-                  <line
-                    x1={ep1.x} y1={ep1.y} x2={ep2.x} y2={ep2.y}
-                    stroke="#1a2535"
-                    strokeWidth={1.5}
+
+                  {/* Glow */}
+                  <path
+                    d={`M ${ep1.x} ${ep1.y} Q ${cx} ${cy} ${ep2.x} ${ep2.y}`}
+                    stroke="rgba(34,211,238,0.12)"
+                    strokeWidth={6}
+                    fill="none"
+                  />
+
+                  {/* Main */}
+                  <path
+                    d={`M ${ep1.x} ${ep1.y} Q ${cx} ${cy} ${ep2.x} ${ep2.y}`}
+                    stroke="rgba(148,163,184,0.45)"
+                    strokeWidth={1.6}
+                    fill="none"
                     markerEnd="url(#arrowhead)"
                   />
+
+                  {/* Label */}
                   <text
-                    x={mx} y={my - 4}
+                    x={cx}
+                    y={cy - 8}
                     textAnchor="middle"
-                    fill="#253548"
-                    fontSize={7}
-                    fontFamily="var(--font-mono)"
+                    fill="#94A3B8"
+                    fontSize={9}
+                    fontWeight={500}
+                    style={{
+                      letterSpacing: "0.04em",
+                    }}
                   >
                     {edge.rel}
                   </text>
@@ -191,36 +513,106 @@ export function GraphViewport() {
               );
             })}
 
-            {/* Nodes */}
+            {/* NODES */}
             {nodes.map((node) => {
-              const r     = getNodeRadius(node.type);
-              const color = NODE_COLORS[node.type as NodeType] ?? "#94a3b8";
-              const label = node.name.length > 12 ? node.name.slice(0, 11) + "…" : node.name;
+              const r = getNodeRadius(node.type);
+
+              const color =
+                NODE_COLORS[node.type] ??
+                "#94A3B8";
+
+              const label =
+                node.name.length > 16
+                  ? node.name.slice(0, 15) + "…"
+                  : node.name;
+
               return (
                 <g
                   key={node.id}
-                  style={{ cursor: "pointer" }}
-                  onMouseEnter={(e) => handleNodeEnter(e, node)}
+                  style={{
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                  }}
+                  onMouseEnter={(e) =>
+                    handleNodeEnter(e, node)
+                  }
                   onMouseLeave={handleNodeLeave}
                 >
-                  {/* Outer glow ring */}
-                  <circle cx={node.x} cy={node.y} r={r + 5} fill={color} opacity={0.04} />
-                  {/* Main circle */}
+
+                  {/* Outer glow */}
                   <circle
-                    cx={node.x} cy={node.y} r={r}
+                    cx={node.x}
+                    cy={node.y}
+                    r={r + 14}
                     fill={color}
-                    fillOpacity={0.15}
-                    stroke={color}
-                    strokeWidth={1.5}
+                    opacity={0.05}
                   />
-                  {/* Label */}
+
+                  {/* Secondary glow */}
+                  <circle
+                    cx={node.x}
+                    cy={node.y}
+                    r={r + 7}
+                    fill={color}
+                    opacity={0.08}
+                  />
+
+                  {/* Main node */}
+                  <circle
+                    cx={node.x}
+                    cy={node.y}
+                    r={r}
+                    fill="#0F172A"
+                    stroke={color}
+                    strokeWidth={2.2}
+                    filter="url(#glow)"
+                  />
+
+                  {/* Ring */}
+                  <circle
+                    cx={node.x}
+                    cy={node.y}
+                    r={r + 2}
+                    fill="none"
+                    stroke={color}
+                    strokeOpacity={0.25}
+                    strokeWidth={3}
+                  />
+
+                  {/* Highlight */}
+                  <circle
+                    cx={node.x - r * 0.25}
+                    cy={node.y - r * 0.25}
+                    r={r * 0.35}
+                    fill="rgba(255,255,255,0.08)"
+                  />
+
+                  {/* Type */}
                   <text
-                    x={node.x} y={node.y + r + 11}
+                    x={node.x}
+                    y={node.y + 4}
                     textAnchor="middle"
                     fill={color}
-                    fillOpacity={0.85}
                     fontSize={8}
-                    fontFamily="var(--font-mono)"
+                    fontWeight={700}
+                    style={{
+                      letterSpacing: "0.08em",
+                    }}
+                  >
+                    {node.type.toUpperCase()}
+                  </text>
+
+                  {/* Label */}
+                  <text
+                    x={node.x}
+                    y={node.y + r + 18}
+                    textAnchor="middle"
+                    fill="#E2E8F0"
+                    fontSize={10}
+                    fontWeight={600}
+                    style={{
+                      letterSpacing: "0.03em",
+                    }}
                   >
                     {label}
                   </text>
@@ -230,106 +622,73 @@ export function GraphViewport() {
           </g>
         </svg>
 
-        {/* Tooltip */}
+        {/* TOOLTIP */}
         {tooltip && (
           <div
-            className="pointer-events-none absolute rounded-lg px-3 py-2.5 z-20"
+            className="
+              pointer-events-none
+              absolute z-50
+              rounded-2xl border border-cyan-400/20
+              bg-black/70
+              px-4 py-3
+              backdrop-blur-xl
+              shadow-[0_0_35px_rgba(0,0,0,0.55)]
+            "
             style={{
-              left: Math.min(tooltip.x, (svgW || 800) - 220),
-              top: Math.min(tooltip.y, (svgH || 500) - 100),
-              background: "var(--card)",
-              border: "1px solid var(--cyan)",
-              boxShadow: "0 8px 24px rgba(0,0,0,0.6)",
-              maxWidth: 200,
+              left: Math.min(
+                tooltip.x,
+                (svgW || 800) - 240
+              ),
+
+              top: Math.min(
+                tooltip.y,
+                (svgH || 500) - 120
+              ),
+
+              maxWidth: 220,
             }}
           >
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--cyan)", letterSpacing: "0.1em", marginBottom: 3 }}>
+            <div
+              className="
+                mb-2 font-mono text-[10px]
+                tracking-[0.16em]
+                text-cyan-300
+              "
+            >
               {tooltip.node.type.toUpperCase()}
             </div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#fff", marginBottom: 3 }}>
+
+            <div className="mb-2 text-sm font-semibold text-white">
               {tooltip.node.name}
             </div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--text-secondary)", wordBreak: "break-all" }}>
-              uid: {tooltip.node.uid ?? tooltip.node.id}
+
+            <div
+              className="
+                font-mono text-[10px]
+                text-slate-400
+              "
+            >
+              UID ·{" "}
+              {tooltip.node.uid ??
+                tooltip.node.id}
             </div>
           </div>
         )}
 
-        {/* Legend */}
+        {/* STATUS */}
         <div
-          className="absolute bottom-4 left-4 rounded-lg p-3"
-          style={{ background: "rgba(13,17,23,0.92)", border: "1px solid var(--border)", backdropFilter: "blur(8px)" }}
+          className="
+            absolute bottom-5 left-5
+            rounded-full border border-emerald-400/20
+            bg-emerald-400/10
+            px-4 py-2
+            font-mono text-[10px]
+            tracking-[0.16em]
+            text-emerald-300
+            backdrop-blur-xl
+          "
         >
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.12em", color: "var(--text-secondary)", marginBottom: 7, textTransform: "uppercase" }}>
-            Node Types
-          </div>
-          <div className="flex flex-col gap-1.5">
-            {Object.entries(NODE_COLORS).map(([type, color]) => (
-              <div key={type} className="flex items-center gap-2" style={{ fontSize: 10, color: "var(--text-primary)" }}>
-                <div className="rounded-full" style={{ width: 7, height: 7, background: color, flexShrink: 0 }} />
-                {type}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* CSV sample box */}
-        <div
-          className="absolute top-4 right-4 rounded-lg p-3"
-          style={{ background: "rgba(13,17,23,0.92)", border: "1px solid var(--border)", backdropFilter: "blur(8px)", maxWidth: 230 }}
-        >
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.12em", color: "var(--text-secondary)", marginBottom: 8, textTransform: "uppercase" }}>
-            CSV · Cypher Paths
-          </div>
-          {CSV_SAMPLES.map((s, i) => (
-            <div
-              key={i}
-              className="py-1"
-              style={{
-                fontFamily: "var(--font-mono)", fontSize: 9,
-                color: "var(--text-primary)",
-                borderBottom: i < CSV_SAMPLES.length - 1 ? "1px solid var(--border)" : "none",
-              }}
-            >
-              <span style={{ color: "var(--cyan)" }}>{s.a}</span>
-              {" -["}
-              <span style={{ color: "var(--amber)" }}>{s.rel}</span>
-              {"]->"}&nbsp;
-              <span style={{ color: "var(--teal)" }}>{s.b}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Minimap */}
-        <div
-          className="absolute bottom-4 right-4 rounded overflow-hidden"
-          style={{ background: "rgba(13,17,23,0.92)", border: "1px solid var(--border)", width: 130, height: 80 }}
-        >
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--text-secondary)", padding: "3px 6px", letterSpacing: "0.1em" }}>
-            MINIMAP
-          </div>
-          <svg width="130" height="62">
-            {nodes.map((n) => {
-              const allX = nodes.map(nd => nd.x);
-              const allY = nodes.map(nd => nd.y);
-              const minX = Math.min(...allX), maxX = Math.max(...allX);
-              const minY = Math.min(...allY), maxY = Math.max(...allY);
-              const scX = 110 / (maxX - minX || 1);
-              const scY = 50  / (maxY - minY || 1);
-              const sc  = Math.min(scX, scY) * 0.85;
-              const color = NODE_COLORS[n.type as NodeType] ?? "#94a3b8";
-              return (
-                <circle
-                  key={n.id}
-                  cx={8  + (n.x - minX) * sc}
-                  cy={6  + (n.y - minY) * sc}
-                  r={2.5}
-                  fill={color}
-                  opacity={0.7}
-                />
-              );
-            })}
-          </svg>
+          {nodes.length} NODES · {edges.length} EDGES
         </div>
       </div>
     </div>
