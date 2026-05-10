@@ -41,15 +41,28 @@ export function getNodeRadius(type: string): number {
   if (type === "Fish" || type === "Concept") return 18;
   return 15;
 }
-
-/** Compute the point on the circumference of a node closest to a target. */
 export function edgeEndpoint(
   from: KGNode,
   to: KGNode,
   radius: number
 ): { x: number; y: number } {
+
   const dx = to.x - from.x;
   const dy = to.y - from.y;
-  const len = Math.sqrt(dx * dx + dy * dy) || 1;
-  return { x: from.x + (dx / len) * radius, y: from.y + (dy / len) * radius };
+
+  const len =
+    Math.sqrt(dx * dx + dy * dy) || 1;
+
+  // Extra spacing between node and edge
+  const gap = 10;
+
+  return {
+    x:
+      from.x +
+      (dx / len) * (radius + gap),
+
+    y:
+      from.y +
+      (dy / len) * (radius + gap),
+  };
 }
