@@ -314,7 +314,7 @@ return (
             </div>
 
             {/* Metrics */}
-            <div className="relative grid grid-cols-1 gap-4 border-b border-white/10 p-6 md:grid-cols-3">
+            <div className="relative flex flex-col gap-3  border-b border-white/10 p-6 md:grid-cols-3">
 
               {/* Metric */}
               <div
