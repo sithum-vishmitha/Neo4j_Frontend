@@ -10,10 +10,10 @@ import {
 } from "lucide-react";
 
 import type { KGNode, KGEdge } from "@/app/types";
+import { useGraph } from "@/app/context/GraphContext";
 
 import {
-  INITIAL_NODES,
-  INITIAL_EDGES,
+
   NODE_COLORS,
 } from "@/app/lib/graphData";
 
@@ -34,9 +34,14 @@ export function GraphViewport() {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [nodes, setNodes] = useState<KGNode[]>([]);
-  const [edges] = useState<KGEdge[]>(INITIAL_EDGES);
+  const {
+    nodes,
+    edges,
 
+  } = useGraph();
+
+
+  const [renderNodes, setRenderNodes] = useState<KGNode[]>([])
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
 
   const [zoom, setZoom] = useState(1);
@@ -62,24 +67,30 @@ export function GraphViewport() {
     h: 500,
   });
 
-  
+
 
   const relayout = useCallback((mode: number) => {
     const { w, h } = dims.current;
+    console.warn(nodes)
+    console.log(layoutRadial(
+          nodes.map((n) => ({ ...n })),
+          w,
+          h
+        ))
 
-    setNodes(
+    setRenderNodes(
       mode === 0
         ? layoutRadial(
-            INITIAL_NODES.map((n) => ({ ...n })),
-            w,
-            h
-          )
+          nodes.map((n) => ({ ...n })),
+          w,
+          h
+        )
         : layoutGrid(
-            INITIAL_NODES.map((n) => ({ ...n })),
-            w
-          )
+          nodes.map((n) => ({ ...n })),
+          w
+        )
     );
-  }, []);
+  }, [nodes]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -181,7 +192,7 @@ export function GraphViewport() {
   };
 
   const nodeMap = Object.fromEntries(
-    nodes.map((n) => [n.id, n])
+    renderNodes.map((n) => [n.id, n])
   );
 
   const { w: svgW, h: svgH } = dims.current;
@@ -507,14 +518,14 @@ export function GraphViewport() {
                       letterSpacing: "0.04em",
                     }}
                   >
-                    {edge.rel} 
+                    {edge.rel}
                   </text>
                 </g>
               );
             })}
 
             {/* NODES */}
-            {nodes.map((node) => {
+            {renderNodes.map((node) => {
               const r = getNodeRadius(node.type);
 
               const color =

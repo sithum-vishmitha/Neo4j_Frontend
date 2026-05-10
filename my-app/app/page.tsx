@@ -7,12 +7,20 @@ import { LeftPanel } from "@/app/components/pipeline/LeftPanel";
 import { GraphViewport } from "@/app/components/graph/GraphViewport";
 import { useFileUpload } from "@/app/hooks/Usefileupload";
 import { usePipeline } from "@/app/hooks/usePipeline";
+import { INITIAL_EDGES, INITIAL_NODES } from "./lib/graphData";
+import { useGraph } from "./context/GraphContext";
 
 export default function Home() {
   const { files, addFiles, removeFile, clearFiles, updateFile } = useFileUpload();
-  const [toastMsg, setToastMsg]   = useState("");
+  const [toastMsg, setToastMsg] = useState("");
   const [toastShow, setToastShow] = useState(false);
-  const [toastKey, setToastKey]   = useState(0);
+  const [toastKey, setToastKey] = useState(0);
+  const {
+    nodes,
+    edges,
+    setEdges,
+    setNodes,
+  } = useGraph();
 
   const showToast = useCallback((msg: string) => {
     setToastMsg(msg);
@@ -37,6 +45,9 @@ export default function Home() {
 
   const handleClear = () => {
     clearFiles();
+    setEdges([])
+    setNodes([])
+
     reset();
   };
 

@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { UploadedFile, PipelineStep } from "@/app/types";
 import { UploadZone } from "@/app/components/pipeline/UploadZone";
 import { PipelineFlow } from "@/app/components/pipeline/PipelineFlow";
+
 import {
   Play,
   Loader2,
@@ -15,6 +16,8 @@ import {
   Network,
 } from "lucide-react";
 import { GraphStats } from "@/app/components/pipeline/GraphStats";
+import { INITIAL_EDGES } from "@/app/lib/graphData";
+import { useGraph } from "@/app/context/GraphContext";
 
 type Tab = "ingest" | "pipeline" | "stats";
 
@@ -33,6 +36,8 @@ const tabs: { id: Tab; label: string }[] = [
   { id: "pipeline", label: "Pipeline" },
   { id: "stats", label: "Graph Stats" },
 ];
+
+
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -54,169 +59,592 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 export function LeftPanel({ files, steps, running, onAddFiles, onRemoveFile, onClear, onRun }: LeftPanelProps) {
   const [activeTab, setActiveTab] = useState<Tab>("ingest");
 
+  const {
+    nodes,
+    edges,
+    setEdges,
+    setNodes,
+  } = useGraph();
+
   // Auto-switch to pipeline tab when running
   const handleRun = () => {
     setActiveTab("pipeline");
+    setEdges([ /* Organizations -> Models */
+      {
+        id: "e1",
+        source: "n1",
+        target: "n4",
+        rel: "DEVELOPS",
+      },
+
+      {
+        id: "e2",
+        source: "n2",
+        target: "n5",
+        rel: "DEVELOPS",
+      },
+
+      {
+        id: "e3",
+        source: "n3",
+        target: "n6",
+        rel: "DEVELOPS",
+      },
+
+      /* Models -> Technology */
+      {
+        id: "e4",
+        source: "n4",
+        target: "n7",
+        rel: "USES",
+      },
+
+      {
+        id: "e5",
+        source: "n5",
+        target: "n7",
+        rel: "USES",
+      },
+
+      {
+        id: "e6",
+        source: "n6",
+        target: "n7",
+        rel: "USES",
+      },
+
+      /* Models -> Dataset */
+      {
+        id: "e7",
+        source: "n4",
+        target: "n10",
+        rel: "TRAINED_ON",
+      },
+
+      {
+        id: "e8",
+        source: "n5",
+        target: "n11",
+        rel: "TRAINED_ON",
+      },
+
+      /* Researchers */
+      {
+        id: "e9",
+        source: "n12",
+        target: "n2",
+        rel: "WORKED_AT",
+      },
+
+      {
+        id: "e10",
+        source: "n13",
+        target: "n2",
+        rel: "WORKED_AT",
+      },
+
+      {
+        id: "e11",
+        source: "n14",
+        target: "n1",
+        rel: "WORKED_AT",
+      },
+
+      /* Papers */
+      {
+        id: "e12",
+        source: "n15",
+        target: "n7",
+        rel: "INTRODUCES",
+      },
+
+      {
+        id: "e13",
+        source: "n16",
+        target: "n7",
+        rel: "BASED_ON",
+      },
+
+      {
+        id: "e14",
+        source: "n17",
+        target: "n9",
+        rel: "RELATED_TO",
+      },
+
+      /* Risks */
+      {
+        id: "e15",
+        source: "n18",
+        target: "n4",
+        rel: "AFFECTS",
+      },
+
+      {
+        id: "e16",
+        source: "n19",
+        target: "n5",
+        rel: "AFFECTS",
+      },
+
+      {
+        id: "e17",
+        source: "n20",
+        target: "n23",
+        rel: "IMPACTS",
+      },
+
+      /* Infrastructure */
+      {
+        id: "e18",
+        source: "n21",
+        target: "n4",
+        rel: "POWERS",
+      },
+
+      {
+        id: "e19",
+        source: "n22",
+        target: "n25",
+        rel: "ENABLES",
+      },
+
+      /* Applications */
+      {
+        id: "e20",
+        source: "n4",
+        target: "n23",
+        rel: "USED_IN",
+      },
+
+      {
+        id: "e21",
+        source: "n4",
+        target: "n24",
+        rel: "USED_IN",
+      },
+
+      {
+        id: "e22",
+        source: "n9",
+        target: "n25",
+        rel: "SUPPORTS",
+      },
+
+      /* Cross Connections */
+      {
+        id: "e23",
+        source: "n8",
+        target: "n4",
+        rel: "IMPROVES",
+      },
+
+      {
+        id: "e24",
+        source: "n7",
+        target: "n15",
+        rel: "DESCRIBED_IN",
+      },
+
+      {
+        id: "e25",
+        source: "n1",
+        target: "n21",
+        rel: "OPERATES",
+      },])
+
+    setNodes([/* Organizations */
+      {
+        id: "n1",
+        type: "Organization",
+        name: "OpenAI",
+        uid: "org_001",
+        x: 0,
+        y: 0,
+      },
+
+      {
+        id: "n2",
+        type: "Organization",
+        name: "DeepMind",
+        uid: "org_002",
+        x: 0,
+        y: 0,
+      },
+
+      {
+        id: "n3",
+        type: "Organization",
+        name: "Anthropic",
+        uid: "org_003",
+        x: 0,
+        y: 0,
+      },
+
+      /* Models */
+      {
+        id: "n4",
+        type: "AIModel",
+        name: "GPT-4",
+        uid: "model_001",
+        x: 0,
+        y: 0,
+      },
+
+      {
+        id: "n5",
+        type: "AIModel",
+        name: "Gemini",
+        uid: "model_002",
+        x: 0,
+        y: 0,
+      },
+
+      {
+        id: "n6",
+        type: "AIModel",
+        name: "Claude",
+        uid: "model_003",
+        x: 0,
+        y: 0,
+      },
+
+      /* Technologies */
+      {
+        id: "n7",
+        type: "Technology",
+        name: "Transformer Architecture",
+        uid: "tech_001",
+        x: 0,
+        y: 0,
+      },
+
+      {
+        id: "n8",
+        type: "Technology",
+        name: "Reinforcement Learning",
+        uid: "tech_002",
+        x: 0,
+        y: 0,
+      },
+
+      {
+        id: "n9",
+        type: "Technology",
+        name: "Knowledge Graph",
+        uid: "tech_003",
+        x: 0,
+        y: 0,
+      },
+
+      /* Datasets */
+      {
+        id: "n10",
+        type: "Dataset",
+        name: "Common Crawl",
+        uid: "data_001",
+        x: 0,
+        y: 0,
+      },
+
+      {
+        id: "n11",
+        type: "Dataset",
+        name: "Wikipedia",
+        uid: "data_002",
+        x: 0,
+        y: 0,
+      },
+
+      /* Researchers */
+      {
+        id: "n12",
+        type: "Researcher",
+        name: "Geoffrey Hinton",
+        uid: "res_001",
+        x: 0,
+        y: 0,
+      },
+
+      {
+        id: "n13",
+        type: "Researcher",
+        name: "Yann LeCun",
+        uid: "res_002",
+        x: 0,
+        y: 0,
+      },
+
+      {
+        id: "n14",
+        type: "Researcher",
+        name: "Ilya Sutskever",
+        uid: "res_003",
+        x: 0,
+        y: 0,
+      },
+
+      /* Papers */
+      {
+        id: "n15",
+        type: "ResearchPaper",
+        name: "Attention Is All You Need",
+        uid: "paper_001",
+        x: 0,
+        y: 0,
+      },
+
+      {
+        id: "n16",
+        type: "ResearchPaper",
+        name: "BERT",
+        uid: "paper_002",
+        x: 0,
+        y: 0,
+      },
+
+      {
+        id: "n17",
+        type: "ResearchPaper",
+        name: "Graph Neural Networks",
+        uid: "paper_003",
+        x: 0,
+        y: 0,
+      },
+
+      /* Risks */
+      {
+        id: "n18",
+        type: "Risk",
+        name: "Hallucination",
+        uid: "risk_001",
+        x: 0,
+        y: 0,
+      },
+
+      {
+        id: "n19",
+        type: "Risk",
+        name: "Bias",
+        uid: "risk_002",
+        x: 0,
+        y: 0,
+      },
+
+      {
+        id: "n20",
+        type: "Risk",
+        name: "Misinformation",
+        uid: "risk_003",
+        x: 0,
+        y: 0,
+      },
+
+      /* Infrastructure */
+      {
+        id: "n21",
+        type: "Infrastructure",
+        name: "GPU Clusters",
+        uid: "infra_001",
+        x: 0,
+        y: 0,
+      },
+
+      {
+        id: "n22",
+        type: "Infrastructure",
+        name: "Vector Database",
+        uid: "infra_002",
+        x: 0,
+        y: 0,
+      },
+
+      /* Applications */
+      {
+        id: "n23",
+        type: "Application",
+        name: "Chatbot",
+        uid: "app_001",
+        x: 0,
+        y: 0,
+      },
+
+      {
+        id: "n24",
+        type: "Application",
+        name: "Code Assistant",
+        uid: "app_002",
+        x: 0,
+        y: 0,
+      },
+
+      {
+        id: "n25",
+        type: "Application",
+        name: "Semantic Search",
+        uid: "app_003",
+        x: 0,
+        y: 0,
+      },])
     onRun();
   };
 
-return (
-  <div className="flex h-full flex-col border-r border-white/10 bg-[#0B1118] text-white">
-    
-    {/* Top Tabs */}
-    <div className="flex border-b border-white/10 bg-[#0D141D] px-2 pt-2">
-      {tabs.map((tab) => {
-        const active = activeTab === tab.id;
+  return (
+    <div className="flex h-full flex-col border-r border-white/10 bg-[#0B1118] text-white">
 
-        return (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`
+      {/* Top Tabs */}
+      <div className="flex border-b border-white/10 bg-[#0D141D] px-2 pt-2">
+        {tabs.map((tab) => {
+          const active = activeTab === tab.id;
+
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`
               relative flex-1 rounded-t-xl px-4 py-3
               text-xs font-semibold tracking-[0.15em]
               transition-all duration-300
-              ${
-                active
+              ${active
                   ? "bg-[#111927] text-cyan-300 shadow-[0_-2px_20px_rgba(34,211,238,0.08)]"
                   : "text-white hover:text-slate-300"
-              }
+                }
             `}
-          >
-            {active && (
-              <div className="absolute inset-x-0 top-10 h-[2px] rounded-full bg-cyan-400" />
-            )}
+            >
+              {active && (
+                <div className="absolute inset-x-0 top-10 h-[2px] rounded-full bg-cyan-400" />
+              )}
 
-            {tab.label}
-          </button>
-        );
-      })}
-    </div>
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
 
-    {/* Content */}
-    <div className="flex-1 overflow-y-auto bg-[#0A1018]">
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto bg-[#0A1018]">
 
-      {/* INGEST */}
-      {activeTab === "ingest" && (
-        <div className="space-y-6 p-6">
+        {/* INGEST */}
+        {activeTab === "ingest" && (
+          <div className="space-y-6 p-6">
 
-          {/* Upload Section */}
-          <div
-            className="
+            {/* Upload Section */}
+            <div
+              className="
               rounded-3xl border border-white/10
               bg-gradient-to-b from-[#121B28] to-[#0F1722]
               p-6
               shadow-[0_0_35px_rgba(0,0,0,0.35)]
             "
-          >
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            >
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
-              <SectionLabel>
-                Upload PDFs to Knowledge Graph
-              </SectionLabel>
+                <SectionLabel>
+                  Upload PDFs to Knowledge Graph
+                </SectionLabel>
 
-              <div
-                className="
+                <div
+                  className="
                   rounded-full border border-cyan-400/20
                   bg-cyan-400/10 px-3 py-1
                   font-mono text-[10px]
                   tracking-[0.14em] text-cyan-300
                 "
-              >
-                DOCUMENT INGESTION
+                >
+                  DOCUMENT INGESTION
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <UploadZone
+                  files={files}
+                  onAdd={onAddFiles}
+                  onRemove={onRemoveFile}
+                />
               </div>
             </div>
 
-            <div className="mt-5">
-              <UploadZone
-                files={files}
-                onAdd={onAddFiles}
-                onRemove={onRemoveFile}
-              />
-            </div>
-          </div>
-
-          {/* Pipeline Architecture */}
-          <div
-            className="
+            {/* Pipeline Architecture */}
+            <div
+              className="
               overflow-hidden rounded-3xl border border-white/10
               bg-gradient-to-b from-[#121B28] to-[#0F1722]
               shadow-[0_0_35px_rgba(0,0,0,0.25)]
             "
-          >
-            {/* Top */}
-            <div className="border-b border-white/10 px-6 py-4">
-              <div className="flex items-center justify-between">
+            >
+              {/* Top */}
+              <div className="border-b border-white/10 px-6 py-4">
+                <div className="flex items-center justify-between">
 
-                <SectionLabel>
-                  Pipeline Architecture
-                </SectionLabel>
+                  <SectionLabel>
+                    Pipeline Architecture
+                  </SectionLabel>
 
-                <div className="flex items-center gap-2">
-                  <Activity className="h-4 w-4 text-emerald-300 animate-pulse" />
+                  <div className="flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-emerald-300 animate-pulse" />
 
-                  <span className="font-mono text-[10px] tracking-[0.12em] text-emerald-300">
-                    ACTIVE PIPELINE
-                  </span>
+                    <span className="font-mono text-[10px] tracking-[0.12em] text-emerald-300">
+                      ACTIVE PIPELINE
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Body */}
-            <div className="p-6">
+              {/* Body */}
+              <div className="p-6">
 
-              {/* Description */}
-              <div
-                className="
+                {/* Description */}
+                <div
+                  className="
                   rounded-2xl border border-cyan-400/10
                   bg-black/20 p-5
                   font-mono text-[11px]
                   leading-7 text-slate-300
                 "
-              >
-                The ingestion pipeline extracts entities, semantic relationships,
-                and graph structures from uploaded PDF documents. Extracted data
-                is transformed into Cypher-compatible graph records and exported
-                as
+                >
+                  The ingestion pipeline extracts entities, semantic relationships,
+                  and graph structures from uploaded PDF documents. Extracted data
+                  is transformed into Cypher-compatible graph records and exported
+                  as
 
-                <span className="mx-1 font-semibold text-cyan-300">
-                  neo4j_query_table_data.csv
-                </span>
+                  <span className="mx-1 font-semibold text-cyan-300">
+                    neo4j_query_table_data.csv
+                  </span>
 
-                for Neo4j ingestion and GraphXR visualization.
-              </div>
+                  for Neo4j ingestion and GraphXR visualization.
+                </div>
 
-              {/* Flow */}
-              <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-5">
+                {/* Flow */}
+                <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-5">
 
-                {[
-                  {
-                    label: "PDF Upload",
-                    icon: FileText,
-                  },
-                  {
-                    label: "NLP Extraction",
-                    icon: BrainCircuit,
-                  },
-                  {
-                    label: "Entity Mapping",
-                    icon: Workflow,
-                  },
-                  {
-                    label: "Neo4j Build",
-                    icon: Database,
-                  },
-                  {
-                    label: "GraphXR Visualize",
-                    icon: Network,
-                  },
-                ].map((step, index) => {
-                  const Icon = step.icon;
+                  {[
+                    {
+                      label: "PDF Upload",
+                      icon: FileText,
+                    },
+                    {
+                      label: "NLP Extraction",
+                      icon: BrainCircuit,
+                    },
+                    {
+                      label: "Entity Mapping",
+                      icon: Workflow,
+                    },
+                    {
+                      label: "Neo4j Build",
+                      icon: Database,
+                    },
+                    {
+                      label: "GraphXR Visualize",
+                      icon: Network,
+                    },
+                  ].map((step, index) => {
+                    const Icon = step.icon;
 
-                  return (
-                    <div
-                      key={step.label}
-                      className="
+                    return (
+                      <div
+                        key={step.label}
+                        className="
                         relative flex flex-col items-center
                         rounded-2xl border border-white/10
                         bg-white/[0.03]
@@ -226,277 +654,276 @@ return (
                         hover:bg-white/[0.05]
                         hover:-translate-y-0.5
                       "
-                    >
-                      <div
-                        className="
+                      >
+                        <div
+                          className="
                           mb-3 flex h-10 w-10 items-center justify-center
                           rounded-xl border border-cyan-400/20
                           bg-cyan-400/10
                         "
-                      >
-                        <Icon className="h-5 w-5 text-cyan-300" />
-                      </div>
+                        >
+                          <Icon className="h-5 w-5 text-cyan-300" />
+                        </div>
 
-                      <div className="text-xs font-medium leading-5 text-white">
-                        {step.label}
-                      </div>
+                        <div className="text-xs font-medium leading-5 text-white">
+                          {step.label}
+                        </div>
 
-                      {index !== 4 && (
-                        <div
-                          className="
+                        {index !== 4 && (
+                          <div
+                            className="
                             absolute -right-2 top-1/2 hidden
                             h-[2px] w-4 bg-cyan-400/30
                             lg:block
                           "
-                        />
-                      )}
-                    </div>
-                  );
-                })}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* PIPELINE */}
-      {activeTab === "pipeline" && (
-        <div className="p-6">
+        {/* PIPELINE */}
+        {activeTab === "pipeline" && (
+          <div className="p-6">
 
-          <div
-            className="
+            <div
+              className="
               relative overflow-hidden rounded-3xl
               border border-white/10
               bg-gradient-to-b from-[#121B28] via-[#101824] to-[#0B1119]
               shadow-[0_0_45px_rgba(0,0,0,0.45)]
             "
-          >
-            {/* Ambient Glow */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(168,85,247,0.08),transparent_40%)]" />
+            >
+              {/* Ambient Glow */}
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(168,85,247,0.08),transparent_40%)]" />
 
-            {/* Header */}
-            <div className="relative border-b border-white/10 px-6 py-5">
+              {/* Header */}
+              <div className="relative border-b border-white/10 px-6 py-5">
 
-              <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between">
 
-                <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-3">
 
-                  <SectionLabel>
-                    Processing Pipeline
-                  </SectionLabel>
+                    <SectionLabel>
+                      Processing Pipeline
+                    </SectionLabel>
 
-                  <p className="mt-1 text-sm text-slate-400">
-                    Monitor real-time execution flow of the KG ingestion pipeline
-                  </p>
+                    <p className="mt-1 text-sm text-slate-400">
+                      Monitor real-time execution flow of the KG ingestion pipeline
+                    </p>
 
-                  <div
-                    className="
+                    <div
+                      className="
                       flex items-center gap-2 rounded-full
                       border border-violet-400/20
                       bg-violet-400/10
                       px-4 py-2
                     "
-                  >
-                    <Activity className="h-4 w-4 text-violet-300 animate-pulse" />
+                    >
+                      <Activity className="h-4 w-4 text-violet-300 animate-pulse" />
 
-                    <span
-                      className="
+                      <span
+                        className="
                         font-mono text-[10px]
                         tracking-[0.16em]
                         text-violet-300
                       "
-                    >
-                      LIVE EXECUTION FLOW
-                    </span>
+                      >
+                        LIVE EXECUTION FLOW
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Metrics */}
-            <div className="relative flex flex-col gap-3  border-b border-white/10 p-6 md:grid-cols-3">
+              {/* Metrics */}
+              <div className="relative flex flex-col gap-3  border-b border-white/10 p-6 md:grid-cols-3">
 
-              {/* Metric */}
-              <div
-                className="
-                  rounded-2xl border border-white/10
-                  bg-white/[0.03]
-                  p-4
-                  transition-all duration-300
-                  hover:border-cyan-400/20
-                  hover:bg-white/[0.05]
-                  hover:-translate-y-0.5
-                "
-              >
-                <div className="font-mono text-[10px] tracking-[0.14em] text-slate-400">
-                  DOCUMENTS
-                </div>
-
-                <div className="mt-2 text-2xl font-semibold text-white">
-                  {files.length}
-                </div>
-
-                <div className="mt-1 text-xs text-emerald-300">
-                  Ready for ingestion
-                </div>
-              </div>
-
-              {/* Metric */}
-              <div
-                className="
-                  rounded-2xl border border-white/10
-                  bg-white/[0.03]
-                  p-4
-                  transition-all duration-300
-                  hover:border-cyan-400/20
-                  hover:bg-white/[0.05]
-                  hover:-translate-y-0.5
-                "
-              >
-                <div className="font-mono text-[10px] tracking-[0.14em] text-slate-400">
-                  PIPELINE STATUS
-                </div>
-
-                <div className="mt-2 flex items-center gap-2">
-
-                  <Activity
-                    className={`h-4 w-4 ${
-                      running
-                        ? "text-amber-300 animate-pulse"
-                        : "text-cyan-300"
-                    }`}
-                  />
-
-                  <span className="text-lg font-semibold text-white">
-                    {running ? "Processing" : "Idle"}
-                  </span>
-                </div>
-
-                <div className="mt-1 text-xs text-slate-400">
-                  Execution engine state
-                </div>
-              </div>
-
-              {/* Metric */}
-              <div
-                className="
-                  rounded-2xl border border-white/10
-                  bg-white/[0.03]
-                  p-4
-                  transition-all duration-300
-                  hover:border-cyan-400/20
-                  hover:bg-white/[0.05]
-                  hover:-translate-y-0.5
-                "
-              >
-                <div className="font-mono text-[10px] tracking-[0.14em] text-slate-400">
-                  TARGET SYSTEM
-                </div>
-
-                <div className="mt-2 text-2xl font-semibold text-white">
-                  Neo4j
-                </div>
-
-                {running ? (
-                  <div className="mt-1 text-xs text-yellow-300">
-                    GraphXR visualization is being prepared
-                  </div>
-                ) : (
-                  <div className="mt-1 text-xs text-green-300">
-                    GraphXR visualization ready
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Flow Area */}
-            <div className="relative p-6">
-
-              <div className="mb-5 flex items-center justify-between">
-
-                <div>
-                  <h3 className="text-sm font-semibold tracking-[0.08em] text-white">
-                    PIPELINE EXECUTION STAGES
-                  </h3>
-
-                  <p className="mt-1 text-xs text-slate-400">
-                    Sequential processing stages for document-to-graph transformation
-                  </p>
-                </div>
-
+                {/* Metric */}
                 <div
                   className="
+                  rounded-2xl border border-white/10
+                  bg-white/[0.03]
+                  p-4
+                  transition-all duration-300
+                  hover:border-cyan-400/20
+                  hover:bg-white/[0.05]
+                  hover:-translate-y-0.5
+                "
+                >
+                  <div className="font-mono text-[10px] tracking-[0.14em] text-slate-400">
+                    DOCUMENTS
+                  </div>
+
+                  <div className="mt-2 text-2xl font-semibold text-white">
+                    {files.length}
+                  </div>
+
+                  <div className="mt-1 text-xs text-emerald-300">
+                    Ready for ingestion
+                  </div>
+                </div>
+
+                {/* Metric */}
+                <div
+                  className="
+                  rounded-2xl border border-white/10
+                  bg-white/[0.03]
+                  p-4
+                  transition-all duration-300
+                  hover:border-cyan-400/20
+                  hover:bg-white/[0.05]
+                  hover:-translate-y-0.5
+                "
+                >
+                  <div className="font-mono text-[10px] tracking-[0.14em] text-slate-400">
+                    PIPELINE STATUS
+                  </div>
+
+                  <div className="mt-2 flex items-center gap-2">
+
+                    <Activity
+                      className={`h-4 w-4 ${running
+                          ? "text-amber-300 animate-pulse"
+                          : "text-cyan-300"
+                        }`}
+                    />
+
+                    <span className="text-lg font-semibold text-white">
+                      {running ? "Processing" : "Idle"}
+                    </span>
+                  </div>
+
+                  <div className="mt-1 text-xs text-slate-400">
+                    Execution engine state
+                  </div>
+                </div>
+
+                {/* Metric */}
+                <div
+                  className="
+                  rounded-2xl border border-white/10
+                  bg-white/[0.03]
+                  p-4
+                  transition-all duration-300
+                  hover:border-cyan-400/20
+                  hover:bg-white/[0.05]
+                  hover:-translate-y-0.5
+                "
+                >
+                  <div className="font-mono text-[10px] tracking-[0.14em] text-slate-400">
+                    TARGET SYSTEM
+                  </div>
+
+                  <div className="mt-2 text-2xl font-semibold text-white">
+                    Neo4j
+                  </div>
+
+                  {running ? (
+                    <div className="mt-1 text-xs text-yellow-300">
+                      GraphXR visualization is being prepared
+                    </div>
+                  ) : (
+                    <div className="mt-1 text-xs text-green-300">
+                      GraphXR visualization ready
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Flow Area */}
+              <div className="relative p-6">
+
+                <div className="mb-5 flex items-center justify-between">
+
+                  <div>
+                    <h3 className="text-sm font-semibold tracking-[0.08em] text-white">
+                      PIPELINE EXECUTION STAGES
+                    </h3>
+
+                    <p className="mt-1 text-xs text-slate-400">
+                      Sequential processing stages for document-to-graph transformation
+                    </p>
+                  </div>
+
+                  <div
+                    className="
                     rounded-full border border-cyan-400/20
                     bg-cyan-400/10 px-3 py-1
                     font-mono text-[10px]
                     tracking-[0.12em]
                     text-cyan-300
                   "
-                >
-                  {steps.length} STAGES
+                  >
+                    {steps.length} STAGES
+                  </div>
                 </div>
-              </div>
 
-              <div
-                className="
+                <div
+                  className="
                   rounded-2xl border border-white/10
                   bg-black/20 p-5
                 "
-              >
-                <PipelineFlow steps={steps} />
+                >
+                  <PipelineFlow steps={steps} />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* STATS */}
-      {activeTab === "stats" && (
-        <div className="p-6">
+        {/* STATS */}
+        {activeTab === "stats" && (
+          <div className="p-6">
 
-          <div
-            className="
+            <div
+              className="
               rounded-3xl border border-white/10
               bg-gradient-to-b from-[#121B28] to-[#0F1722]
               p-6
               shadow-[0_0_35px_rgba(0,0,0,0.35)]
             "
-          >
-            <div className="flex items-center justify-between">
+            >
+              <div className="flex items-center justify-between">
 
-              <SectionLabel>
-                Graph Statistics
-              </SectionLabel>
+                <SectionLabel>
+                  Graph Statistics
+                </SectionLabel>
 
-              <div
-                className="
+                <div
+                  className="
                   rounded-full border border-emerald-400/20
                   bg-emerald-400/10 px-3 py-1
                   font-mono text-[10px]
                   tracking-[0.14em] text-emerald-300
                 "
-              >
-                ANALYTICS DASHBOARD
+                >
+                  ANALYTICS DASHBOARD
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <GraphStats />
               </div>
             </div>
-
-            <div className="mt-6">
-              <GraphStats />
-            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
 
-    {/* Bottom Action Bar */}
-    <div className="border-t border-white/10 bg-[#0D141D]/95 p-5 backdrop-blur-xl">
+      {/* Bottom Action Bar */}
+      <div className="border-t border-white/10 bg-[#0D141D]/95 p-5 backdrop-blur-xl">
 
-      <div className="flex gap-3">
+        <div className="flex gap-3">
 
-        {/* Clear */}
-        <button
-          onClick={onClear}
-          className="
+          {/* Clear */}
+          <button
+            onClick={onClear}
+            className="
             rounded-2xl border border-white/10
             bg-white/[0.03]
             px-6 py-3
@@ -507,41 +934,40 @@ return (
             hover:bg-white/[0.06]
             hover:text-white
           "
-        >
-          <div className="flex items-center gap-2">
-            <Trash2 className="h-4 w-4" />
-            <span>CLEAR</span>
-          </div>
-        </button>
+          >
+            <div className="flex items-center gap-2">
+              <Trash2 className="h-4 w-4" />
+              <span>CLEAR</span>
+            </div>
+          </button>
 
-        {/* Process */}
-        <button
-          onClick={handleRun}
-          disabled={running}
-          className={`
+          {/* Process */}
+          <button
+            onClick={handleRun}
+            disabled={running}
+            className={`
             group flex flex-1 items-center justify-center gap-3
             rounded-2xl border px-6 py-3
             text-xs font-semibold tracking-[0.14em]
             transition-all duration-300
-            ${
-              running
+            ${running
                 ? "border-amber-400/30 bg-amber-400/10 text-amber-300"
                 : "border-cyan-400/25 bg-cyan-400/10 text-cyan-300 hover:bg-cyan-400/15 hover:shadow-[0_0_35px_rgba(34,211,238,0.15)]"
-            }
+              }
           `}
-        >
-          {running ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Play className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-          )}
+          >
+            {running ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Play className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+            )}
 
-          {running
-            ? "PROCESSING KNOWLEDGE GRAPH..."
-            : "PROCESS & BUILD KG"}
-        </button>
+            {running
+              ? "PROCESSING KNOWLEDGE GRAPH..."
+              : "PROCESS & BUILD KG"}
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
 }
