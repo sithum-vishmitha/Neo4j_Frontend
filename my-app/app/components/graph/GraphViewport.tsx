@@ -46,6 +46,8 @@ export function GraphViewport() {
     y: 0,
   });
 
+  
+
   const [layoutMode, setLayoutMode] = useState(0);
 
   const isPanning = useRef(false);
@@ -61,6 +63,9 @@ export function GraphViewport() {
     w: 800,
     h: 500,
   });
+
+  const animationRef = useRef<number | null>(null);
+
 
   
 
