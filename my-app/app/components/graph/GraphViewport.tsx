@@ -12,10 +12,7 @@ import {
 import type { KGNode, KGEdge } from "@/app/types";
 import { useGraph } from "@/app/context/GraphContext";
 
-import {
 
-  NODE_COLORS,
-} from "@/app/lib/graphData";
 
 import {
   layoutRadial,
@@ -37,6 +34,7 @@ export function GraphViewport() {
   const {
     nodes,
     edges,
+    nodeColors
 
   } = useGraph();
 
@@ -373,7 +371,7 @@ export function GraphViewport() {
           </div>
 
           <div className="space-y-2">
-            {Object.entries(NODE_COLORS).map(
+            {Object.entries(nodeColors).map(
               ([type, color]) => (
                 <div
                   key={type}
@@ -529,7 +527,7 @@ export function GraphViewport() {
               const r = getNodeRadius(node.type);
 
               const color =
-                NODE_COLORS[node.type] ??
+                nodeColors[node.type] ??
                 "#94A3B8";
 
               const label =

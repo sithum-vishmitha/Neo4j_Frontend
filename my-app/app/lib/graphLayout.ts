@@ -1,4 +1,5 @@
-import type { KGNode, NodeType } from "../types";
+import { object } from "framer-motion/client";
+import type { KGEdge, KGNode, NodeType, GraphStats } from "../types";
 import { NODE_COLORS } from "./graphData";
 
 
@@ -18,14 +19,14 @@ export function color_formatter(node_types: NodeType[]): Record<string, string> 
 
 
 
-  const uniqueTypes  = [
+  const uniqueTypes = [
     ...new Set(node_types),
   ]
 
-  const colors : Record<string, string> | any= {};
+  const colors: Record<string, string> | any = {};
 
-  uniqueTypes.forEach((type , index) =>{
-    colors[type] = palette[index %  palette.length]
+  uniqueTypes.forEach((type, index) => {
+    colors[type] = palette[index % palette.length]
   })
 
 
@@ -174,3 +175,21 @@ export function edgeEndpoint(
       (dy / len) * (radius + gap),
   };
 }
+
+
+export const GRAPH_STATS: GraphStats = {
+  nodes: 7,
+  relationships: 787,
+  nodeTypes: 0,
+  relTypes: 18,
+  nodeDistribution: {
+    Organization: 22, Tool: 18, Fish: 12, Concept: 10,
+    Attribute: 8, Craft: 6, Activity: 5, Group: 4, Threat: 3,
+  },
+  relDistribution: {
+    LOCATED_IN: 22, MADE_OF: 18, FOUND_IN: 14, USED_IN: 12,
+    SUPPORTS: 10, OPERATED_IN: 8, PRACTICED_IN: 6, AFFECTS: 4,
+  },
+};
+
+

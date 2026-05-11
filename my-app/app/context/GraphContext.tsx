@@ -18,6 +18,7 @@ import {
   INITIAL_NODES,
   INITIAL_EDGES,
 } from "@/app/lib/graphData";
+import { color_formatter } from "../lib/graphLayout";
 
 /* =========================
    Context Type
@@ -26,13 +27,14 @@ import {
 interface GraphContextType {
   nodes: KGNode[];
   edges: KGEdge[];
+  nodeColors  : Record<string , string>
 
   setNodes: React.Dispatch<
     React.SetStateAction<KGNode[]>
   >;
 
   setEdges: React.Dispatch<
-  React.SetStateAction<KGEdge[]>
+    React.SetStateAction<KGEdge[]>
   >
 
 }
@@ -62,8 +64,10 @@ export function GraphProvider({
   const [edges, setEdges] =
     useState<KGEdge[]>(INITIAL_EDGES);
 
- 
 
+  const nodeColors  = color_formatter(
+    nodes.map((n) => n.type)
+  )
 
   return (
     <GraphContext.Provider
@@ -73,6 +77,8 @@ export function GraphProvider({
 
         setNodes,
         setEdges,
+
+        nodeColors,
 
       }}
     >

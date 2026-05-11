@@ -8,6 +8,20 @@ export interface KGNode {
   y: number;
 }
 
+export type NodeRel =  Record<string , number>
+export type relDub =  Record<string , number>
+
+export interface KG_GRAPGH_STATS {
+  nodes: number,
+  relationships: number,
+  nodeTypes: number,
+  relTypes: number,
+  nodeDistribution:NodeRel
+  relDistribution: relDub
+
+}
+
+
 export interface KGEdge {
   id: string;
   source: string;

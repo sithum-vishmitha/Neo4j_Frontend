@@ -1,17 +1,18 @@
 "use client";
-import { GRAPH_STATS, NODE_COLORS } from "@/app/lib/graphData";
+import { calculate_grapgh_statitics, NODE_COLORS } from "@/app/lib/graphData";
 import type { NodeType } from "@/app/types";
-
+import { useGraph } from "@/app/context/GraphContext";
 export function GraphStats() {
-  const { nodes, relationships, nodeTypes, relTypes, nodeDistribution, relDistribution } = GRAPH_STATS;
+  const { nodes, relationships, nodeTypes, relTypes, nodeDistribution, relDistribution } = calculate_grapgh_statitics();
   const maxNode = Math.max(...Object.values(nodeDistribution));
   const maxRel  = Math.max(...Object.values(relDistribution));
 
+  const  {nodeColors}  = useGraph()
   const metricCards = [
     { val: nodes,         label: "Total Nodes",     color: "var(--cyan)",   sub: "from pipeline" },
     { val: relationships, label: "Relationships",   color: "var(--purple)", sub: "from CSV rows" },
-    { val: nodeTypes,     label: "Node Types",      color: "var(--teal)",   sub: "Location, Fish…" },
-    { val: relTypes,      label: "Relation Types",  color: "var(--amber)",  sub: "FOUND_IN, MADE_OF…" },
+    { val: nodeTypes,     label: "Node Types",      color: "var(--teal)",   sub: ''},
+    { val: relTypes,      label: "Relation Types",  color: "var(--amber)",  sub: '' },
   ];
 
   return (
@@ -53,7 +54,7 @@ export function GraphStats() {
                   className="h-full rounded-full"
                   style={{
                     width: `${((count / maxNode) * 100).toFixed(0)}%`,
-                    background: NODE_COLORS[type as NodeType] ?? "#94a3b8",
+                    background: nodeColors[type] ?? "#94a3b8",
                     transition: "width 1s ease",
                   }}
                 />
