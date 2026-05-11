@@ -36,10 +36,7 @@ export default function Home() {
 
   const handleRun = () => {
     // Mark all files as processing
-    files.forEach((f, i) => {
-      setTimeout(() => updateFile(f.id, { status: "processing" }), i * 350);
-      setTimeout(() => updateFile(f.id, { status: "done" }), i * 350 + 1400);
-    });
+
 
          setEdges([ /* Organizations -> Models */
       {
@@ -225,7 +222,7 @@ export default function Home() {
         rel: "OPERATES",
       },])
 
-    setNodes([/* Organizations */
+      setNodes([/* Organizations */
       {
         id: "n1",
         type: "Organization",

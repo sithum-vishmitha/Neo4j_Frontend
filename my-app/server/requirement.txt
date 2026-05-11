@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+python-multipart
+sse-starlette
+pydantic
+neo4j
+python-dotenv
+pymupdf
+pandas
+openpyxl
