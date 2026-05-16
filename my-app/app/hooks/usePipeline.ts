@@ -2,7 +2,7 @@
 import { useState, useCallback, useRef } from "react";
 import type { PipelineStep, PipelineStepStatus } from "@/app/types";
 import { PIPELINE_STEPS } from "@/app/lib/graphData";
-
+import { usePipelineEvents } from "../context/PipelineContext";
 function makeSteps(): PipelineStep[] {
   return PIPELINE_STEPS.map((s) => ({ ...s, status: "idle", progress: 0 }));
 }
@@ -10,7 +10,10 @@ function makeSteps(): PipelineStep[] {
 export function usePipeline(onComplete: () => void) {
   const [steps, setSteps] = useState<PipelineStep[]>(makeSteps());
   const [running, setRunning] = useState(false);
-  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);4
+  const {
+  events
+} = usePipelineEvents()
 
   const setStep = (id: number, patch: Partial<PipelineStep>) =>
     setSteps((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
@@ -25,6 +28,7 @@ export function usePipeline(onComplete: () => void) {
 
       // Mark previous as done
       if (index > 0) setStep(index - 1, { status: "done", progress: 100 });
+      alert(events[events.length-1].type)
 
       setStep(index, { status: "active", progress: 0 });
 

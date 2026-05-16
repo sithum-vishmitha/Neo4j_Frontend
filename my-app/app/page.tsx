@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Starfield } from "@/app/components/ui/Starfield";
 import { Header } from "@/app/components/ui/Header";
 import { Toast } from "@/app/components/ui/Toast";
@@ -7,14 +7,21 @@ import { LeftPanel } from "@/app/components/pipeline/LeftPanel";
 import { GraphViewport } from "@/app/components/graph/GraphViewport";
 import { useFileUpload } from "@/app/hooks/Usefileupload";
 import { usePipeline } from "@/app/hooks/usePipeline";
-import { INITIAL_EDGES, INITIAL_NODES } from "./lib/graphData";
+import { useRealtimePipeline } from "./hooks/useRealtimePipeline";
+import { SmartAlert } from "./components/SmartAlert";
 import { useGraph } from "./context/GraphContext";
-
+import { usePipelineEvents } from "./context/PipelineContext";
+type AlertType = "success" | "error" | "warning" | "info";
 export default function Home() {
   const { files, addFiles, removeFile, clearFiles, updateFile } = useFileUpload();
-  const [toastMsg, setToastMsg] = useState("");
-  const [toastShow, setToastShow] = useState(false);
-  const [toastKey, setToastKey] = useState(0);
+
+  const { startPipeline } = useRealtimePipeline()
+  const [errorMsg, setErrorMsg] = useState<string>("");
+  const {
+  addEvent , setEvents
+} = usePipelineEvents()
+  const [errorType, setErrorType] = useState<AlertType>("info");
+  const [showAlert, setShowAlert] = useState(false);
   const {
     nodes,
     edges,
@@ -23,9 +30,8 @@ export default function Home() {
   } = useGraph();
 
   const showToast = useCallback((msg: string) => {
-    setToastMsg(msg);
-    setToastKey(k => k + 1);
-    setToastShow(true);
+    setErrorMsg(msg)
+
   }, []);
 
   const onPipelineComplete = useCallback(() => {
@@ -34,12 +40,86 @@ export default function Home() {
 
   const { steps, running, start, reset } = usePipeline(onPipelineComplete);
 
-  const handleRun = () => {
+
+  useEffect(() => {
+
+    const timer = setTimeout(() => {
+      setShowAlert(false)
+    }, 5000);
+
+    return () => {
+      clearTimeout(timer)
+    }
+
+  }, [showAlert])
+
+  const handleRun = async () => {
+
+
+    setEvents([])
     // Mark all files as processing
+
+    if (!files.length) {
+      setShowAlert(true)
+
+      setErrorMsg("Upload atleast one file")
+      return
+    }
+
+
+
+    // start()
+
+    for (const f of files) {
+
+      updateFile(
+        f.id,
+        {
+          status: "processing",
+          progress: 10,
+        }
+
+      )
+
+
+
+
+      await startPipeline(
+        f.file,
+        (event) => {
+          console.log(`ado ${event.type}}`)
+          addEvent(event)
+        
+
+          if (event.type === "pipeline_completed") {
+            updateFile(
+              f.id,
+              {
+                status: "done",
+                progress: 100,
+              }
+            )
+          }
+
+          if (
+            event.type === "chunk_processing"
+          ) {
+
+            showToast(
+              event.message
+            )
+          }
+
+        }
+      )
+    }
+
+
+    /*
 
 
     const nodes_from_server = [
-      /* Countries */
+
       {
         id: "n1",
         type: "Country",
@@ -59,7 +139,7 @@ export default function Home() {
         uid: "country_003",
       },
 
-      /* Cities */
+
       {
         id: "n4",
         type: "City",
@@ -79,7 +159,7 @@ export default function Home() {
         uid: "city_003",
       },
 
-      /* Universities */
+
       {
         id: "n7",
         type: "University",
@@ -99,7 +179,7 @@ export default function Home() {
         uid: "uni_003",
       },
 
-      /* Students */
+   
       {
         id: "n10",
         type: "Student",
@@ -119,7 +199,7 @@ export default function Home() {
         uid: "student_003",
       },
 
-      /* Courses */
+
       {
         id: "n13",
         type: "Course",
@@ -139,7 +219,6 @@ export default function Home() {
         uid: "course_003",
       },
 
-      /* Companies */
       {
         id: "n16",
         type: "Company",
@@ -153,7 +232,7 @@ export default function Home() {
         uid: "company_002",
       },
 
-      /* Technologies */
+    
       {
         id: "n18",
         type: "Technology",
@@ -172,7 +251,7 @@ export default function Home() {
         name: "Docker",
         uid: "tech_003",
       },
-    ]
+    
 
     setNodes(nodes_from_server.map((d) => ({
       ...d,
@@ -181,7 +260,7 @@ export default function Home() {
     })))
 
     setEdges([
-      /* Countries -> Cities */
+  
       {
         id: "e1",
         source: "n1",
@@ -201,7 +280,7 @@ export default function Home() {
         rel: "HAS_CITY",
       },
 
-      /* Cities -> Universities */
+   
       {
         id: "e4",
         source: "n4",
@@ -221,7 +300,7 @@ export default function Home() {
         rel: "LOCATED_IN",
       },
 
-      /* Students -> Universities */
+
       {
         id: "e7",
         source: "n10",
@@ -241,7 +320,6 @@ export default function Home() {
         rel: "STUDIES_AT",
       },
 
-      /* Students -> Courses */
       {
         id: "e10",
         source: "n10",
@@ -261,7 +339,7 @@ export default function Home() {
         rel: "ENROLLED_IN",
       },
 
-      /* Companies -> Technologies */
+
       {
         id: "e13",
         source: "n16",
@@ -279,9 +357,7 @@ export default function Home() {
         source: "n17",
         target: "n20",
         rel: "USES",
-      },
-
-      /* Students -> Technologies */
+   
       {
         id: "e16",
         source: "n10",
@@ -301,7 +377,6 @@ export default function Home() {
         rel: "LEARNS",
       },
 
-      /* Companies -> Students */
       {
         id: "e19",
         source: "n16",
@@ -316,13 +391,16 @@ export default function Home() {
       },
     ])
 
-    start();
+    */
+    //start();
   };
 
   const handleClear = () => {
     clearFiles();
     setEdges([])
     setNodes([])
+    
+    setEvents([])
 
     reset();
   };
@@ -354,7 +432,7 @@ export default function Home() {
         </div>
       </main>
 
-      <Toast key={toastKey} message={toastMsg} show={toastShow} type="success" />
+      <SmartAlert open={showAlert} type={errorType} title={errorMsg} onClose={() => setShowAlert(false)} />
     </div>
   );
 }

@@ -35,12 +35,16 @@ export function Header() {
         <div className="flex items-center gap-3">
 
           {
-            1 ?
+            0 ?
               (<StatusBadge
                 icon={<Database size={14} />}
                 label="NEO4J CONNECTED"
                 color="cyan"
-              />) : (<>
+              />) : (<><StatusBadge
+                icon={<Database size={14} />}
+                label="NEO4J NOT CONNECTED !"
+                color="red"
+              />
               </>)
 
           }
@@ -70,7 +74,7 @@ function StatusBadge({
 }: {
   label: string;
   icon: React.ReactNode;
-  color: "cyan" | "violet";
+  color: "cyan" | "violet" | "red";
 }) {
   const styles = {
     cyan: {
@@ -90,6 +94,15 @@ function StatusBadge({
       dot: "bg-violet-300",
       glow: "shadow-[0_0_20px_rgba(167,139,250,0.18)]",
     },
+
+    red: {
+      border: "border-red-400/30",
+      bg: "bg-red-400/10",
+      text: "text-red-300",
+      dot: "bg-red-300",
+      glow: "shadow-[0_0_20px_rgba(248,113,113,0.18)]", // red-400 = rgb(248,113,113)
+    },
+
   };
 
   const s = styles[color];

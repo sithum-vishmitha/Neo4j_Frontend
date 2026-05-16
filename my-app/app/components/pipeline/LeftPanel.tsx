@@ -16,7 +16,6 @@ import {
   Network,
 } from "lucide-react";
 import { GraphStats } from "@/app/components/pipeline/GraphStats";
-import { INITIAL_EDGES } from "@/app/lib/graphData";
 import { useGraph } from "@/app/context/GraphContext";
 
 type Tab = "ingest" | "pipeline" | "stats";

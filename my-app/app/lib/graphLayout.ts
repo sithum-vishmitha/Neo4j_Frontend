@@ -126,7 +126,7 @@ export function getNodeColor(
 ): string {
 
   return (
-    NODE_COLORS[type as NodeType] ??
+    NODE_COLORS[type as any] ??
     "#94a3b8"
   );
 }

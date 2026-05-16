@@ -1,5 +1,5 @@
 "use client";
-import { calculate_grapgh_statitics, NODE_COLORS } from "@/app/lib/graphData";
+import { calculate_grapgh_statitics } from "@/app/lib/graphData";
 import type { NodeType } from "@/app/types";
 import { useGraph } from "@/app/context/GraphContext";
 export function GraphStats() {

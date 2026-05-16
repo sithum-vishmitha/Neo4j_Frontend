@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { GraphProvider } from "./context/GraphContext";
+import { PipelineEventProvider , usePipelineEvents } from "./context/PipelineContext";
 
 export const metadata: Metadata = {
   title: "GraphPilot — Neo4j + GraphXR Pipeline",
@@ -11,11 +12,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="overflow-hidden">
-        <GraphProvider>
-          {children}
-        </GraphProvider>
-        
+        <PipelineEventProvider>
 
+
+          <GraphProvider>
+            {children}
+          </GraphProvider>
+
+        </PipelineEventProvider>
       </body>
     </html>
   );

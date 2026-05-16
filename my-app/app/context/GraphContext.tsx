@@ -14,10 +14,7 @@ import type {
   KGEdge,
 } from "@/app/types";
 
-import {
-  INITIAL_NODES,
-  INITIAL_EDGES,
-} from "@/app/lib/graphData";
+
 import { color_formatter } from "../lib/graphLayout";
 
 /* =========================
@@ -59,10 +56,10 @@ export function GraphProvider({
 }) {
 
   const [nodes, setNodes] =
-    useState<KGNode[]>(INITIAL_NODES);
+    useState<KGNode[]>([]);
 
   const [edges, setEdges] =
-    useState<KGEdge[]>(INITIAL_EDGES);
+    useState<KGEdge[]>([]);
 
 
   const nodeColors  = color_formatter(
