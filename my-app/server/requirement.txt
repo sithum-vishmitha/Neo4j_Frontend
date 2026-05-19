@@ -11,3 +11,5 @@ requests
 click
 annotated_types
 anyio
+distro
+openai

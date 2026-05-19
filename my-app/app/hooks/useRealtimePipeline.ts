@@ -37,6 +37,15 @@ export function useRealtimePipeline() {
       onEvent?: (event: any) => void
     ) => {
 
+      // -----------------------------
+      // CLEAR OLD STATE
+      // -----------------------------
+
+      setEvents([])
+
+      setNodes([])
+
+      setEdges([])
       // -----------------------------------
       // CREATE JOB ID
       // -----------------------------------
@@ -48,13 +57,15 @@ export function useRealtimePipeline() {
       // CONNECT WS FIRST
       // -----------------------------------
 
-      connectPipelineSocket(
+    await  connectPipelineSocket(
 
         jobId,
 
         (event) => {
 
-          console.log(event)
+
+      
+
 
           onEvent?.(event)
 
@@ -98,9 +109,6 @@ export function useRealtimePipeline() {
       // SMALL DELAY
       // -----------------------------------
 
-      await new Promise(
-        (r) => setTimeout(r, 300)
-      )
 
       // -----------------------------------
       // UPLOAD PDF

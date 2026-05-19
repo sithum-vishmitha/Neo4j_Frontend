@@ -100,14 +100,101 @@ export function PipelineFlow({ steps }: PipelineFlowProps) {
 
 const eventTypes =
   events.map((d) => d.type)
+  console.log(eventTypes)
 
 console.warn(eventTypes)
   return (
     <div className="flex flex-col text-white">
       <p>Live status  {events[events.length-1]?.message}</p>
 
+      
       {/* =======================================
       STEP 1
+  ======================================= */}
+
+      <div
+        className="flex gap-3 relative pb-4"
+      >
+
+        {/* Line */}
+
+        <div
+          className="absolute left-[14px] top-[30px] bottom-0 w-px"
+          style={{
+            background:
+              "linear-gradient(to bottom, var(--teal), var(--border))",
+          }}
+        />
+
+    
+     
+        {
+          eventTypes.includes("pdf_uploaded") ?
+            (<Tick />) : (
+              <Circle />
+
+
+            )
+        }
+
+        {/* Info */}
+
+        <div className="flex-1 pt-1">
+
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: "#fff",
+            }}
+          >
+            PDF Upload
+          </div>
+
+          <div
+            style={{
+              fontFamily:
+                "var(--font-mono)",
+
+              fontSize: 10,
+
+              color:
+                "var(--text-muted)",
+
+              marginTop: 2,
+
+              lineHeight: 1.5,
+            }}
+          >
+           Uplaoding process of the pdf
+          </div>
+
+          {/* Progress */}
+
+          <div
+            className="mt-2 h-0.5 rounded-full overflow-hidden"
+            style={{
+              background:
+                "var(--border)",
+            }}
+          >
+            <div
+              className="h-full rounded-full"
+              style={{
+                width: "100%",
+
+                background:
+                  "var(--teal)",
+              }}
+            />
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* =======================================
+      STEP 2
   ======================================= */}
 
       <div
@@ -191,7 +278,7 @@ console.warn(eventTypes)
       </div>
 
       {/* =======================================
-      STEP 2
+      STEP 3
   ======================================= */}
 
       <div
@@ -210,7 +297,7 @@ console.warn(eventTypes)
 
        
         {
-          1 ?
+           eventTypes.includes("pipeline_completed")  ?
             (<Tick />) : (
               <Circle />
 
@@ -249,7 +336,7 @@ console.warn(eventTypes)
               lineHeight: 1.5,
             }}
           >
-            NER + relation detection via LLM
+            NER + relation detection via LLM - {eventTypes[eventTypes.length-1] === "chunk_processing" ? events[events.length-1].message : ''}
           </div>
 
           {/* Progress */}
@@ -293,7 +380,7 @@ console.warn(eventTypes)
       </div>
 
       {/* =======================================
-      STEP 3
+      STEP 4
   ======================================= */}
 
       <div
@@ -312,24 +399,15 @@ console.warn(eventTypes)
 
         {/* Dot */}
 
-        <div
-          className="relative z-10 flex-shrink-0 flex items-center justify-center rounded-full text-sm font-bold"
-          style={{
-            width: 30,
-            height: 30,
+     
+        {
+           eventTypes.includes("pipeline_completed")  ?
+            (<Tick />) : (
+              <Circle />
 
-            border:
-              "1.5px solid var(--border)",
 
-            background:
-              "transparent",
-
-            color:
-              "var(--text-muted)",
-          }}
-        >
-          ⬢
-        </div>
+            )
+        }
 
         {/* Info */}
 
@@ -369,41 +447,28 @@ console.warn(eventTypes)
       </div>
 
       {/* =======================================
-      STEP 4
+      STEP 5
   ======================================= */}
 
       <div
         className="flex gap-3 relative pb-4"
       >
 
-        <div
-          className="absolute left-[14px] top-[30px] bottom-0 w-px"
-          style={{
-            background:
-              "var(--border)",
-          }}
-        />
+               
+        {
+           eventTypes.includes("pipeline_completed")  ?
+            (<Tick />) : (
+              <Circle />
 
-        <div
-          className="relative z-10 flex-shrink-0 flex items-center justify-center rounded-full text-sm font-bold"
-          style={{
-            width: 30,
-            height: 30,
 
-            border:
-              "1.5px solid var(--border)",
+            )
+        }
 
-            background:
-              "transparent",
-
-            color:
-              "var(--text-muted)",
-          }}
-        >
-          ⏚
-        </div>
+      
 
         <div className="flex-1 pt-1">
+
+    
 
           <div
             style={{
@@ -439,31 +504,22 @@ console.warn(eventTypes)
       </div>
 
       {/* =======================================
-      STEP 5
+      STEP 6
   ======================================= */}
 
       <div
         className="flex gap-3 relative"
       >
 
-        <div
-          className="relative z-10 flex-shrink-0 flex items-center justify-center rounded-full text-sm font-bold"
-          style={{
-            width: 30,
-            height: 30,
+      
+        {
+           eventTypes.includes("pipeline_completed")  ?
+            (<Tick />) : (
+              <Circle />
 
-            border:
-              "1.5px solid var(--border)",
 
-            background:
-              "transparent",
-
-            color:
-              "var(--text-muted)",
-          }}
-        >
-          ◈
-        </div>
+            )
+        }
 
         <div className="flex-1 pt-1">
 

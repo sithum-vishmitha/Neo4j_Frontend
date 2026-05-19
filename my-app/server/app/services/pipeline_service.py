@@ -8,7 +8,7 @@ from app.config import settings
 from app.services.pdf_service import extract_pdf_text
 from app.services.neo4j_service import Neo4jService
 from app.services.event_emitter import emit_event
-from app.extraction.qwen_extractor import extract_with_qwen
+from app.extraction.qwen_extractor import extract_with_llm
 from app.extraction.normalizer import normalize_result
 from app.utils.chunker import (
     split_sentences,
@@ -23,6 +23,7 @@ async def process_pdf_job(
     
 
   print("PIPELINE STARTED")
+
 
   neo4j = Neo4jService()
   #endure the neo4j service
@@ -44,7 +45,7 @@ async def process_pdf_job(
     #start the extract from pdf with emitting stram
     text =  await extract_pdf_text(pdf_path=pdf_path , job_id=job_id)
     #split he text to cleared sentences
-    print(f"This is text {text}")
+
     sents  = split_sentences(text=text)
     #extract the meaningful chinks with overload usign the nltk
     chunks  = chunk_by_chars(sents=sents ,  max_chars= settings.max_chars , overlap_sents= settings.overlap_sents)
@@ -71,16 +72,15 @@ async def process_pdf_job(
       )
 
       #get the llm result for this chunk
-      result = await extract_with_qwen(
+      result = await extract_with_llm(
         chunk_id=
-        chunk_id , text= chunk , model= "qwen"
+        chunk_id , text= chunk , model= "gpt"
       )
 
       #normalise the LLm result 
       result =  normalize_result(result)
 
 
-      print(result)
 
       #emit hte event for completiomn of the extraction
       await emit_event(
