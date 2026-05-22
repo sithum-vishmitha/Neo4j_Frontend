@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { UploadedFile, PipelineStep } from "@/app/types";
 import { UploadZone } from "@/app/components/pipeline/UploadZone";
 import { PipelineFlow } from "@/app/components/pipeline/PipelineFlow";
+import  ModelSelector from "@/app/components/pipeline/ModelSelector";
 
 import {
   Play,
@@ -141,6 +142,9 @@ export function LeftPanel({ files, steps, running, onAddFiles, onRemoveFile, onC
                 />
               </div>
             </div>
+
+            {/* Model Selector */}
+            <ModelSelector />
 
             {/* Pipeline Architecture */}
             <div
