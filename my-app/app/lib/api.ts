@@ -2,7 +2,8 @@ const API_URL = "http://localhost:8000"
 export async function uploadPDF(
 
     file: File,
-    jobId: string
+    jobId: string,
+    model  :string
 
 ) {
     const formData = new FormData()
@@ -11,6 +12,11 @@ export async function uploadPDF(
   "job_id",
   jobId
 )
+formData.append(
+  "model",
+  model
+)
+
 
     const response = await fetch(
         `${API_URL}/api/extract`,

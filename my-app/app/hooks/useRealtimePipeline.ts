@@ -6,6 +6,7 @@ import {
   usePipelineEvents
 } from "../context/PipelineContext"
 
+import { useModel } from "../context/ModelContext "
 import {
   uploadPDF
 } from "../lib/api"
@@ -24,6 +25,8 @@ export function useRealtimePipeline() {
   const {
     setEvents
   } = usePipelineEvents()
+
+  const  {selected}  = useModel()
 
   const {
     setNodes,
@@ -105,9 +108,6 @@ export function useRealtimePipeline() {
         }
       )
 
-      // -----------------------------------
-      // SMALL DELAY
-      // -----------------------------------
 
 
       // -----------------------------------
@@ -116,7 +116,8 @@ export function useRealtimePipeline() {
 
       await uploadPDF(
         file,
-        jobId
+        jobId,
+        selected
       )
     },
 
@@ -124,6 +125,7 @@ export function useRealtimePipeline() {
       setNodes,
       setEdges,
       setEvents,
+      selected
     ]
   )
 

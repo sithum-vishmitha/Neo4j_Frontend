@@ -27,7 +27,7 @@ router = APIRouter(
 
 
 @router.post("/extract" , response_model=UploadResponse)
-async def extract_pdf(job_id : str=  Form(...) ,file :UploadFile = File(...)  ):
+async def extract_pdf(job_id : str=  Form(...) ,file :UploadFile = File(...)  , model  :str = Form(...) ):
     os.makedirs(settings.upload_dir , exist_ok=True)
 
    
@@ -58,7 +58,8 @@ async def extract_pdf(job_id : str=  Form(...) ,file :UploadFile = File(...)  ):
     asyncio.create_task(
         process_pdf_job(
             job_id=job_id , 
-            pdf_path= save_path
+            pdf_path= save_path,
+            model=model
         )
     )
 

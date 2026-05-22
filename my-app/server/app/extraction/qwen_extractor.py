@@ -123,6 +123,7 @@ async def open_ai_chat(prompt: str):
 
 
 async def model_swither(model :str , prompt :str):
+      print(f"-------------------------------------------------------------This is the model{model}")
       if model == "qwen":
        raw = await  qwen_chat(prompt=prompt)
 

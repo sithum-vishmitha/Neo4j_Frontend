@@ -4,6 +4,7 @@ from typing import List , Dict  , Any , Optional
 class UploadResponse(BaseModel):
     job_id : str
     status: str = "started"
+    model : str 
 
 
 class GraphNode(BaseModel):

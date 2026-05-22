@@ -1,8 +1,18 @@
 "use client";
-
 import { BrainCircuit } from "lucide-react";
+import { useState } from "react";
+import { useModel , ModelLabel } from "@/app/context/ModelContext ";
 
 export default function ModelSelector() {
+
+
+  const models = [
+    { id: "qwen", label : "Qwen" },
+    { id: "mistral", label: "Mistral24B"},  { id: "gpt", label: "GPT"},
+
+  ]
+
+  const {selected, setSelected} = useModel();
   return (
     <div
       className="
@@ -29,34 +39,27 @@ export default function ModelSelector() {
       </div>
 
       <div className="mt-5 grid gap-3">
-        <button
-          type="button"
+        <select
           className="
-            rounded-2xl border border-cyan-400/20
-            bg-cyan-400/10 px-4 py-4
-            text-left transition-all duration-300
-            hover:border-cyan-400/40 hover:bg-cyan-400/15
-          "
+    w-full rounded-xl border border-slate-700 bg-slate-900
+    px-4 py-3 text-sm text-white
+    focus:outline-none focus:ring-2 focus:ring-cyan-400  
+  "  onChange={(e)=>(setSelected(e.target.value as ModelLabel) )}
+  value={selected}
+  
         >
-          <p className="text-sm font-semibold text-white">Qwen</p>
-          <p className="mt-1 text-xs text-slate-400">
-          </p>
-        </button>
-
-        <button
-          type="button"
-          className="
-            rounded-2xl border border-violet-400/20
-            bg-violet-400/10 px-4 py-4
-            text-left transition-all duration-300
-            hover:border-violet-400/40 hover:bg-violet-400/15
-          "
-        >
-          <p className="text-sm font-semibold text-white">Mistral24B</p>
-          <p className="mt-1 text-xs text-slate-400">
-          </p>
-        </button>
+          {
+            models.map((item ,_)=>{
+              return(
+             <option value={item.id}>{item.label}</option>
+          
+              )
+            })
+          }
+         
+        </select>
       </div>
+       <p className="mt-2 text-xs text-slate-400">You selected {models[models.findIndex((d)=> d.id === selected)]?.label} Model to KG Extraction task.</p>
     </div>
   );
 }

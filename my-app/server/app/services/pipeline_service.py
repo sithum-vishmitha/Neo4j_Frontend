@@ -18,8 +18,11 @@ from app.utils.chunker import (
 
 async def process_pdf_job(
         job_id : str ,
-        pdf_path : str
+        pdf_path : str,
+        model : str,
 ):
+  
+  print(model)
     
 
   print("PIPELINE STARTED")
@@ -43,7 +46,7 @@ async def process_pdf_job(
     )
 
     #start the extract from pdf with emitting stram
-    text =  await extract_pdf_text(pdf_path=pdf_path , job_id=job_id)
+    text =  await extract_pdf_text(pdf_path=pdf_path , job_id=job_id )
     #split he text to cleared sentences
 
     sents  = split_sentences(text=text)
@@ -74,7 +77,7 @@ async def process_pdf_job(
       #get the llm result for this chunk
       result = await extract_with_llm(
         chunk_id=
-        chunk_id , text= chunk , model= "gpt"
+        chunk_id , text= chunk , model= model
       )
 
       #normalise the LLm result 
