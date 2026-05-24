@@ -601,30 +601,17 @@ export function GraphViewport() {
                     x={node.x}
                     y={node.y + 4}
                     textAnchor="middle"
-                    fill={color}
+                    fill='white'
                     fontSize={8}
                     fontWeight={700}
                     style={{
                       letterSpacing: "0.08em",
                     }}
                   >
-                    {node.type.toUpperCase()}
-                  </text>
-
-                  {/* Label */}
-                  <text
-                    x={node.x}
-                    y={node.y + r + 18}
-                    textAnchor="middle"
-                    fill="#E2E8F0"
-                    fontSize={10}
-                    fontWeight={600}
-                    style={{
-                      letterSpacing: "0.03em",
-                    }}
-                  >
                     {label}
                   </text>
+
+             
                 </g>
               );
             })}

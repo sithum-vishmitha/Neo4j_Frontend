@@ -22,7 +22,7 @@ class GraphEdge(BaseModel):
 
 class GraphSnapshot(BaseModel):
     nodes   : List[GraphNode] = Field(default_factory=list)
-    edges  : List[GraphEdge] = Field(default_factory=List)
+    edges  : List[GraphEdge] = Field(default_factory=list)
 
 
 
