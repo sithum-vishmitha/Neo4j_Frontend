@@ -17,6 +17,7 @@ import { useGraph } from "@/app/context/GraphContext";
 import {
   layoutRadial,
   layoutGrid,
+  layoutTree,
   getNodeRadius,
   edgeEndpoint,
 } from "@/app/lib/graphLayout";
@@ -78,6 +79,12 @@ export function GraphViewport() {
 
     setRenderNodes(
       mode === 0
+        ? layoutTree(
+          nodes.map((n) => ({ ...n })),
+          edges,
+          w
+        )
+      : mode === 1
         ? layoutRadial(
           nodes.map((n) => ({ ...n })),
           w,
@@ -88,7 +95,7 @@ export function GraphViewport() {
           w
         )
     );
-  }, [nodes]);
+  }, [nodes, edges]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -182,7 +189,7 @@ export function GraphViewport() {
   };
 
   const toggleLayout = () => {
-    const next = (layoutMode + 1) % 2;
+    const next = (layoutMode + 1) % 3;
 
     setLayoutMode(next);
 

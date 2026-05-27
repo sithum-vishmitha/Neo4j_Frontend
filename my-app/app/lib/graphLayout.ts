@@ -121,6 +121,86 @@ export function layoutGrid(
   }));
 }
 
+export function layoutTree(
+  nodes: KGNode[],
+  edges: KGEdge[],
+  width: number
+): KGNode[] {
+  if (nodes.length === 0) return [];
+
+  const nodeMap = new Map(nodes.map((node) => [node.id, node]));
+
+  const children = new Map<string, string[]>();
+  const incomingCount = new Map<string, number>();
+
+  nodes.forEach((node) => {
+    children.set(node.id, []);
+    incomingCount.set(node.id, 0);
+  });
+
+  edges.forEach((edge) => {
+    if (!nodeMap.has(edge.source) || !nodeMap.has(edge.target)) return;
+
+    children.get(edge.source)?.push(edge.target);
+    incomingCount.set(edge.target, (incomingCount.get(edge.target) ?? 0) + 1);
+  });
+
+  const roots = nodes.filter((node) => (incomingCount.get(node.id) ?? 0) === 0);
+  const startNodes = roots.length > 0 ? roots : [nodes[0]];
+
+  const levels: string[][] = [];
+  const visited = new Set<string>();
+
+  const queue = startNodes.map((node) => ({
+    id: node.id,
+    level: 0,
+  }));
+
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+
+    if (visited.has(current.id)) continue;
+    visited.add(current.id);
+
+    if (!levels[current.level]) {
+      levels[current.level] = [];
+    }
+
+    levels[current.level].push(current.id);
+
+    for (const childId of children.get(current.id) ?? []) {
+      queue.push({
+        id: childId,
+        level: current.level + 1,
+      });
+    }
+  }
+
+  nodes.forEach((node) => {
+    if (!visited.has(node.id)) {
+      if (!levels[0]) levels[0] = [];
+      levels[0].push(node.id);
+    }
+  });
+
+  const topPadding = 120;
+  const levelGap = 180;
+
+  return nodes.map((node) => {
+    const levelIndex = levels.findIndex((level) => level.includes(node.id));
+    const level = levels[levelIndex] ?? [];
+    const index = level.indexOf(node.id);
+
+    const xGap = width / (level.length + 1);
+
+    return {
+      ...node,
+      x: xGap * (index + 1),
+      y: topPadding + levelIndex * levelGap,
+    };
+  });
+}
+
 export function getNodeColor(
   type: string
 ): string {
