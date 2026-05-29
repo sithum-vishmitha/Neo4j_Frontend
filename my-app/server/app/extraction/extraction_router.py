@@ -1,8 +1,9 @@
 import os
 import uuid
 import asyncio
-from fastapi import Form
 
+from fastapi import Form
+from neo4j  import GraphDatabase
 from fastapi import (
     APIRouter , 
     UploadFile,
@@ -17,12 +18,17 @@ from app.schemas import UploadResponse
 from app.services.pipeline_service import process_pdf_job
 from app.services.event_emitter import emit_event
 
-
 router = APIRouter(
     prefix="/api",
     tags=["extraction"]
 )
 
+
+driver  = GraphDatabase.driver(
+ settings.neo4j_uri , 
+ auth=(settings.neo4j_user , settings.neo4j_pass)
+
+)
 
 
 
@@ -68,5 +74,18 @@ async def extract_pdf(job_id : str=  Form(...) ,file :UploadFile = File(...)  , 
     )
 
 
+@router.delete("/graph/clear")
+async def clear_graph():
+    query = """
+    MATCH (n)
+    DETACH DELETE n
+    """
 
+    with driver.session() as session:
+        session.run(query)
+
+    return {
+        "message": "Knowledge graph cleared"
+    }
+    
 

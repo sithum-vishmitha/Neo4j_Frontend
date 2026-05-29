@@ -3,19 +3,19 @@ export async function uploadPDF(
 
     file: File,
     jobId: string,
-    model  :string
+    model: string
 
 ) {
     const formData = new FormData()
     formData.append("file", file)
     formData.append(
-  "job_id",
-  jobId
-)
-formData.append(
-  "model",
-  model
-)
+        "job_id",
+        jobId
+    )
+    formData.append(
+        "model",
+        model
+    )
 
 
     const response = await fetch(
@@ -36,6 +36,24 @@ formData.append(
 
 
 
+
+
+}
+
+export async function clearKnowledgeGraph() {
+    const response = await fetch(
+        `${API_URL}/api/graph/clear`,
+        {
+            method: "DELETE",
+        }
+    )
+
+    if (!response.ok) { 
+        throw new Error("Failed to clear grapgh")
+    }
+
+
+    return response.json()
 
 
 }

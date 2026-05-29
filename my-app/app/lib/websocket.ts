@@ -1,6 +1,6 @@
 const WS_URL = "ws://localhost:8000"
 let socket: WebSocket | null = null
-
+import type { PipelineEvent } from "@/app/context/PipelineContext"
 export function connectPipelineSocket(
     jobId: string,
     onMessage: (data: any) => void
@@ -26,7 +26,7 @@ export function connectPipelineSocket(
     }
 
     socket.onmessage = (event) => {
-        const data = JSON.parse(event.data)
+        const data = JSON.parse(event.data) as PipelineEvent
     
 
         onMessage(data)
@@ -51,4 +51,14 @@ export function connectPipelineSocket(
 
 
 
+}
+
+
+export function disconnectPipelineSocket() { 
+    if (socket)  { 
+        socket.close();
+        socket = null
+
+        console.log("WS manually disconnected");
+    }
 }

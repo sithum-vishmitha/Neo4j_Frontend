@@ -11,6 +11,8 @@ import { useRealtimePipeline } from "./hooks/useRealtimePipeline";
 import { SmartAlert } from "./components/SmartAlert";
 import { useGraph } from "./context/GraphContext";
 import { usePipelineEvents } from "./context/PipelineContext";
+import { disconnectPipelineSocket } from "./lib/websocket";
+import { clearKnowledgeGraph } from "./lib/api";
 type AlertType = "success" | "error" | "warning" | "info";
 export default function Home() {
   const { files, addFiles, removeFile, clearFiles, updateFile } = useFileUpload();
@@ -396,6 +398,7 @@ export default function Home() {
   };
 
   const handleClear = () => {
+    disconnectPipelineSocket()
     clearFiles();
     setEdges([])
     setNodes([])
@@ -403,6 +406,7 @@ export default function Home() {
     setEvents([])
 
     reset();
+    clearKnowledgeGraph()
   };
 
   return (
