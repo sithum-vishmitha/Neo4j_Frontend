@@ -9,6 +9,7 @@ from app.services.pdf_service import extract_pdf_text
 from app.services.neo4j_service import Neo4jService
 from app.services.event_emitter import emit_event
 from app.extraction.qwen_extractor import extract_with_llm
+from app.services.websocket_manager import manager
 from app.extraction.normalizer import normalize_result
 from app.utils.chunker import (
     split_sentences,
@@ -31,6 +32,7 @@ async def process_pdf_job(
   neo4j = Neo4jService()
   #endure the neo4j service
   neo4j.ensure_schema()
+
   
   
   try:
@@ -60,6 +62,11 @@ async def process_pdf_job(
 
     #prcess the chuks
     for idx , chunk in enumerate(chunks):
+      if not await manager.has_listeners(job_id):
+         print(f"Stopping {job_id}: no clients connected")
+         return
+
+      
       chunk_id  = f"{job_id}_chunk{idx+1}"
 
       #stream the event
